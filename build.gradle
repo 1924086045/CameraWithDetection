@@ -23,11 +23,11 @@ buildscript {
 
 allprojects {
     repositories {
-//        maven { url 'https://maven.aliyun.com/repository/public/' }
         google()
         jcenter()
         maven { url "https://jitpack.io" }
-        maven { url 'https://dl.bintray.com/jenly/maven' }
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+//        maven { url 'https://dl.bintray.com/jenly/maven' }
     }
 }
 
