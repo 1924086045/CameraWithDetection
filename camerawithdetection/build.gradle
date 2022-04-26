@@ -1,0 +1,89 @@
+plugins{
+    id 'com.android.library'
+}
+apply plugin: 'maven-publish'
+group='com.gitee.yyc2413'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11 -frtti -fexceptions"
+                abiFilters 'armeabi-v7a', 'arm64-v8a'
+                arguments '-DANDROID_STL=c++_shared' // needed to enable imwrite
+            }
+        }
+        ndk {
+            moduleName "test"
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+        multiDexEnabled true
+    }
+
+
+    afterEvaluate {
+        publishing {
+            publications {
+                // Creates a Maven publication called "release".
+                release(MavenPublication) {
+                    // Applies the component for the release build variant.
+//                    from components.release
+
+                    // You can then customize attributes of the publication as shown below.
+                    groupId = 'com.zodo.camerawithdetection'
+                    artifactId = 'final'
+                    version = 'v1.0.1'
+                }
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/jnilibs/CMakeLists.txt"
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = [ 'libs','src/main/jniLibs']  // libs
+        }
+    }
+    buildToolsVersion '28.0.3'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'com.github.xuexiangjys:XQRCode:1.0.6'
+    implementation 'com.king.zxing:zxing-lite:1.1.3'
+    implementation 'cn.bertsir.zbarLibary:zbarlibary:1.4.1'
+}

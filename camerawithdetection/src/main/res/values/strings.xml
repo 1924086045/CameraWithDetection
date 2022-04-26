@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">食品安全综合检测仪</string>
+    <string name="appname">ZH300\n食品安全综合检测仪</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="picture">拍照</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\\\\\\\'t support Camera2 API.</string>
+    <string name="hege">阴性</string>
+    <string name="buhege">疑似阳性</string>
+</resources>
