@@ -15,4 +15,5 @@ public class CommonString {
     public static final String MULTI_CHANNEL_LISTS="MULTI_CHANNEL_LISTS";//多通道列表
     public static final String RESULT_LISTS="RESULT_LISTS";//检测数据结果列表
 
+
 }
