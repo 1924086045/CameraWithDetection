@@ -6,7 +6,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 set(ocvlibs "D:/opencv-4.5.0-android-sdk/OpenCV-android-sdk/sdk/native/libs")
 
-include_directories(D:/opencv-4.5.0-android-sdk/OpenCV-android-sdk/sdk/native/jni/include)
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(libopencv_java4 SHARED IMPORTED )
 set_target_properties(libopencv_java4 PROPERTIES
