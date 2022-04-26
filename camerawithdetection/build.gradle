@@ -25,6 +25,7 @@ android {
             moduleName "test"
             abiFilters 'armeabi-v7a', 'arm64-v8a'
         }
+        ndkVersion '22.1.7171670'
         multiDexEnabled true
     }
 
