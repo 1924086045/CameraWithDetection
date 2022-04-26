@@ -39,7 +39,7 @@ android {
 //                    from components.release
 
                     // You can then customize attributes of the publication as shown below.
-                    groupId = 'com.zodo.camerawithdetection'
+//                    groupId = 'com.zodo.camerawithdetection'
                     artifactId = 'final'
                     version = 'v1.0.1'
                 }
