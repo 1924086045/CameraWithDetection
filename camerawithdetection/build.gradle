@@ -60,14 +60,14 @@ android {
             dirs 'libs'
         }
     }
-    externalNativeBuild {
-        cmake {
-            path "src/main/jnilibs/CMakeLists.txt"
-        }
-    }
     sourceSets {
         main {
             jniLibs.srcDirs = [ 'libs','src/main/jniLibs']  // libs
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/jnilibs/CMakeLists.txt"
         }
     }
     buildToolsVersion '28.0.3'
