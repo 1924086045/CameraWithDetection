@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 group='com.gitee.yyc2413'
 
@@ -36,7 +36,7 @@ android {
                     from components.release
                     groupId = 'com.cmmboy.toast' //groupId 随便取
                     artifactId = 'cmmboy'  //artifactId 随便取
-                    version = '1.0.0'
+                    version = 'v1.0.2'
                 }
             }
         }
