@@ -4,15 +4,15 @@
 # Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.4.1)
-set(ocvlibs "/camerawithdetection/src/main/jinLibs")
+set(ocvlibs "D:/opencv-4.5.0-android-sdk/OpenCV-android-sdk/sdk/native/libs")
 
 include_directories(D:/opencv-4.5.0-android-sdk/OpenCV-android-sdk/sdk/native/jni/include)
 
 add_library(libopencv_java4 SHARED IMPORTED )
 set_target_properties(libopencv_java4 PROPERTIES
-        IMPORTED_LOCATION "${ocvlibs}/${ANDROID_ABI}/libopencv_java4.so")
+        IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/libopencv_java4.so")
 
-# Creates and names a library, sets it as either STATIC
+# Creates and names a library, sets it as either STATIC PROJECT_SOURCE_DIR
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
