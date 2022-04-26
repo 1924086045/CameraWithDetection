@@ -32,15 +32,11 @@ android {
     afterEvaluate {
         publishing {
             publications {
-                // Creates a Maven publication called "release".
                 release(MavenPublication) {
-                    // Applies the component for the release build variant.
-//                    from components.release
-
-                    // You can then customize attributes of the publication as shown below.
-//                    groupId = 'com.zodo.camerawithdetection'
-                    artifactId = 'final'
-                    version = 'v1.0.1'
+                    from components.release
+                    groupId = 'com.cmmboy.toast' //groupId 随便取
+                    artifactId = 'cmmboy'  //artifactId 随便取
+                    version = '1.0.0'
                 }
             }
         }
