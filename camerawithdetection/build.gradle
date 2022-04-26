@@ -1,6 +1,4 @@
-plugins{
-    id 'com.android.library'
-}
+apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 group='com.gitee.yyc2413'
 
