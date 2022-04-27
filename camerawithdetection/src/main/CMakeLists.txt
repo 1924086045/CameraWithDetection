@@ -4,13 +4,13 @@
 # Sets the minimum version of CMake required to build the native library.
 
 cmake_minimum_required(VERSION 3.4.1)
-set(ocvlibs "D:/opencv-4.5.0-android-sdk/OpenCV-android-sdk/sdk/native/libs")
+#set(ocvlibs "D:/opencv-4.5.0-android-sdk/OpenCV-android-sdk/sdk/native/libs")
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(libopencv_java4 SHARED IMPORTED )
 set_target_properties(libopencv_java4 PROPERTIES
-        IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/jniLibs/${ANDROID_ABI}/libopencv_java4.so")
+        IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/jniLibs/arm64-v8a/libopencv_java4.so")
 
 # Creates and names a library, sets it as either STATIC PROJECT_SOURCE_DIR
 # or SHARED, and provides the relative paths to its source code.
