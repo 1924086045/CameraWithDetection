@@ -10,7 +10,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(libopencv_java4 SHARED IMPORTED )
 set_target_properties(libopencv_java4 PROPERTIES
-        IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/jniLibs/armeabi-v7a/libopencv_java4.so")
+        IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/jniLibs/${ANDROID_ABI}/libopencv_java4.so")
 
 # Creates and names a library, sets it as either STATIC PROJECT_SOURCE_DIR
 # or SHARED, and provides the relative paths to its source code.
