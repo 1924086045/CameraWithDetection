@@ -73,14 +73,14 @@ dependencies {
 project.afterEvaluate {
     publishing {
         publications {
-//            mavenAar(MavenPublication) {
-//                afterEvaluate {
-//                    artifactId "release"
-//                    from components.release
-//                }
-//            }
+            mavenAar(MavenPublication) {
+                afterEvaluate {
+                    artifactId "release"
+                    from components.release
+                }
+            }
             release(MavenPublication) {
-                from components.release
+//                from components.release
                 artifactId = 'release'  //artifactId 随便取
 //                version = 'v1.2.4'
             }
