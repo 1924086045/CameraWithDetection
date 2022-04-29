@@ -35,16 +35,16 @@ android {
             publications {
                 mavenAar(MavenPublication) {
                     afterEvaluate {
-                        artifactId "cmmboy"
+                        artifactId "release"
                         from components.release
                     }
                 }
-//                release(MavenPublication) {
-//                    from components.release
-//                    groupId = 'com.cmmboy.toast' //groupId 随便取
-//                    artifactId = 'cmmboy'  //artifactId 随便取
-//                    version = 'v1.0.3'
-//                }
+                release(MavenPublication) {
+                    from components.release
+                    groupId = 'com.zodo.camerawithdetection' //groupId 随便取
+                    artifactId = 'release'  //artifactId 随便取
+                    version = 'v1.2.4'
+                }
             }
         }
     }
