@@ -29,26 +29,6 @@ android {
         multiDexEnabled true
     }
 
-
-    afterEvaluate {
-        publishing {
-            publications {
-                mavenAar(MavenPublication) {
-                    afterEvaluate {
-                        artifactId "release"
-                        from components.release
-                    }
-                }
-                release(MavenPublication) {
-                    from components.release
-                    groupId = 'com.zodo.camerawithdetection' //groupId 随便取
-                    artifactId = 'release'  //artifactId 随便取
-                    version = 'v1.2.4'
-                }
-            }
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -88,4 +68,22 @@ dependencies {
     implementation 'com.github.xuexiangjys:XQRCode:1.0.6'
     implementation 'com.king.zxing:zxing-lite:1.1.3'
     implementation 'cn.bertsir.zbarLibary:zbarlibary:1.4.1'
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+//            mavenAar(MavenPublication) {
+//                afterEvaluate {
+//                    artifactId "release"
+//                    from components.release
+//                }
+//            }
+            release(MavenPublication) {
+                from components.release
+                artifactId = 'release'  //artifactId 随便取
+//                version = 'v1.2.4'
+            }
+        }
+    }
 }
