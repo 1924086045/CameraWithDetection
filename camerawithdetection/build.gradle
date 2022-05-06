@@ -73,16 +73,19 @@ dependencies {
 project.afterEvaluate {
     publishing {
         publications {
-            mavenAar(MavenPublication) {
-                afterEvaluate {
-                    artifactId "release"
-                    from components.release
-                }
-            }
+//            mavenAar(MavenPublication) {
+//                afterEvaluate {
+//                    groupId = 'com.zodo.camerawithdetection'//你要发布的库的组ID  建议使用包名
+//                    artifactId "cameraWithDetection"
+//                    from components.release
+//                    version = 'v1.3.2'
+//                }
+//            }
             release(MavenPublication) {
-//                from components.release
-                artifactId = 'release'  //artifactId 随便取
-//                version = 'v1.2.4'
+                groupId = 'com.zodo.camerawithdetection'//你要发布的库的组ID  建议使用包名
+                artifactId "cameraWithDetection"
+                from components.release
+                version = 'v1.3.3'
             }
         }
     }
