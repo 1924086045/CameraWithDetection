@@ -25,7 +25,7 @@ android {
             moduleName "test"
             abiFilters  'arm64-v8a'
         }
-        ndkVersion '21.1.6352462'
+        ndkVersion '22.1.7171670'
         multiDexEnabled true
     }
 
@@ -85,7 +85,7 @@ project.afterEvaluate {
                 groupId = 'com.zodo.camerawithdetection'//你要发布的库的组ID  建议使用包名
                 artifactId "cameraWithDetection"
                 from components.release
-                version = 'v1.3.4'
+                version = 'v1.3.5'
             }
         }
     }
