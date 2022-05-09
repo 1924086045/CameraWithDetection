@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.gson.Gson;
 import com.zodo.camerawithdetection.CameraDetection;
 import com.zodo.camerawithdetection.bean.DetectionProject;
 import com.zodo.camerawithdetection.bean.QueryResBean;
@@ -72,11 +73,13 @@ public class MainActivity extends AppCompatActivity {
                     listData.add(queryResBean);
                 }
 
+                String gson=new Gson().toJson(listData);
+
                 CameraDetection.builder(MainActivity.this)
                         .setMultiChannel(true)
                         .setDetectionType(DetectionType.JIAO_JIN_TI)
                         .setDetectionProjectList(projects)
-                        .setMultiList(listData)
+                        .setMultiList(gson)
                         .build(new OnResultCallback() {
                             @Override
                             public void resultWithProject(String path, String checkValue, String checkResult) {

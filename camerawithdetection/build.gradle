@@ -68,6 +68,7 @@ dependencies {
     implementation 'com.github.xuexiangjys:XQRCode:1.0.6'
     implementation 'com.king.zxing:zxing-lite:1.1.3'
     implementation 'cn.bertsir.zbarLibary:zbarlibary:1.4.1'
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
 
 project.afterEvaluate {
@@ -85,7 +86,7 @@ project.afterEvaluate {
                 groupId = 'com.zodo.camerawithdetection'//你要发布的库的组ID  建议使用包名
                 artifactId "cameraWithDetection"
                 from components.release
-                version = 'v1.3.7'
+                version = 'v1.3.8'
             }
         }
     }

@@ -3,6 +3,8 @@ package com.zodo.camerawithdetection;
 import android.app.Activity;
 import android.content.Intent;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.zodo.camerawithdetection.activity.CameraActivity;
 import com.zodo.camerawithdetection.bean.DetectionProject;
 import com.zodo.camerawithdetection.bean.QueryResBean;
@@ -88,8 +90,9 @@ public class CameraDetection {
         /**
          * 多通道列表
          */
-        public Builder setMultiList(Object list) {
-            detection.listData = (ArrayList<QueryResBean>) list;
+        public Builder setMultiList(String list) {
+            ArrayList<QueryResBean> queryResBeans=new Gson().fromJson(list,new TypeToken<ArrayList<QueryResBean>>(){}.getType());
+            detection.listData = new ArrayList<>(queryResBeans);
             return this;
         }
 
