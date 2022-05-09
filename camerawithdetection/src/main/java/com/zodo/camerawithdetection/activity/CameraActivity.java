@@ -1,12 +1,10 @@
 package com.zodo.camerawithdetection.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -16,10 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.king.zxing.util.CodeUtils;
 import com.xuexiang.xqrcode.XQRCode;
 import com.zodo.camerawithdetection.R;
-import com.zodo.camerawithdetection.bean.CheckSampleBean;
 import com.zodo.camerawithdetection.bean.DetectionProject;
 import com.zodo.camerawithdetection.bean.JniBeans;
-import com.zodo.camerawithdetection.bean.QueryRes;
+import com.zodo.camerawithdetection.bean.QueryResBean;
 import com.zodo.camerawithdetection.callback.CameraCallBack;
 import com.zodo.camerawithdetection.common.CommonString;
 import com.zodo.camerawithdetection.common.DetectionType;
@@ -28,9 +25,6 @@ import com.zodo.camerawithdetection.utils.CommonUtils;
 import com.zodo.camerawithdetection.utils.ImageUtils;
 
 import java.io.File;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,7 +59,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
 
     private ArrayList<DetectionProject> detectionProjects;//检测项目列表
 
-    private ArrayList<QueryRes> listData;//多通道列表
+    private ArrayList<QueryResBean> listData;//多通道列表
 
     private Date date;
     private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
@@ -80,14 +74,14 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
         isMultiChannel = getIntent().getBooleanExtra(CommonString.IS_MULTI_CHANNEL, false);
         mProject = (DetectionProject) getIntent().getExtras().getSerializable(CommonString.DETECTION_PROJECT);
         detectionProjects = (ArrayList<DetectionProject>) getIntent().getExtras().getSerializable(CommonString.DETECTION_PROJECT_LISTS);
-        listData = (ArrayList<QueryRes>) getIntent().getExtras().getSerializable(CommonString.MULTI_CHANNEL_LISTS);
+        listData = (ArrayList<QueryResBean>) getIntent().getExtras().getSerializable(CommonString.MULTI_CHANNEL_LISTS);
 
         if (!isMultiChannel && listData == null) {
             //如果为单通道默认生成一个实体
             listData = new ArrayList<>();
-            QueryRes queryRes = new QueryRes(null, "1", "", "", "",
+            QueryResBean queryResBean = new QueryResBean(null, "1", "", "", "",
                     mProject.getProjectname(), "", "", "", "", "0", "", "", "", "", "");
-            listData.add(queryRes);
+            listData.add(queryResBean);
         }
         date = new Date();
 
@@ -167,7 +161,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                     boolean isAllRight = true;
                     for (int i = 0; i < list.size(); i++) {
                         JniBeans bean = list.get(i);
-                        QueryRes resData = listData.get(i);
+                        QueryResBean resData = listData.get(i);
                         resData.setImgpath(bean.getPath());
                         Uri imgUri = new Uri.Builder().path(bean.getPro()).build();
                         String proRes = CodeUtils.parseCode(imgUri.getPath());
@@ -250,7 +244,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                 Collections.reverse(stringList);
                 String proRes = "24";
                 for (int i = 0; i < stringList.size(); i++) {
-                    QueryRes resData = listData.get(i);
+                    QueryResBean resData = listData.get(i);
                     DetectionProject detectionProject = getDetectionProject(proRes, resData.getProject());
                     double yuzhi = detectionProject.getYuzhi();
                     if ("".equals(resData.getYpmc())) {
@@ -294,7 +288,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
 //        stringList.remove(stringList.size()-1);
                 Collections.reverse(stringList);
                 for (int i = 0; i < stringList.size(); i++) {
-                    QueryRes resData = listData.get(i);
+                    QueryResBean resData = listData.get(i);
                     resData.setValue(stringList.get(i));
                     int value = Integer.valueOf(stringList.get(i));
                     if (value < 34 && value > 10) {
@@ -335,7 +329,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                     return;
                 }
                 for (int i = 0; i < stringList.size(); i++) {
-                    QueryRes resData = listData.get(i);
+                    QueryResBean resData = listData.get(i);
                     if (resData.getYpmc().equals("")) {
                         continue;
                     }
@@ -372,7 +366,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
     /**
      * 回传检测结果数据
      */
-    private void setIntentValueResult(String path, ArrayList<QueryRes> rowsDTOS) {
+    private void setIntentValueResult(String path, ArrayList<QueryResBean> rowsDTOS) {
         Intent intent = new Intent();
         intent.putExtra(CommonString.CAMERA_PHOTO, path);
         intent.putExtra(CommonString.RESULT_LISTS, rowsDTOS);

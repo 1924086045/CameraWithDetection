@@ -1,10 +1,12 @@
 package com.zodo.camerawithdetection.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by zzf on 17-7-25.
  */
 
-public class QueryRes {
+public class QueryResBean implements Serializable {
     Long id;
     String num;
     String detail;
@@ -22,8 +24,8 @@ public class QueryRes {
     String weight;
     String phone;
 
-    public QueryRes(Long id, String num, String detail, String until, String giveUntil, String project, String value, String result, String date, String person,
-                    String upload, String ypfl, String ypmc, String imgpath, String weight, String phone) {
+    public QueryResBean(Long id, String num, String detail, String until, String giveUntil, String project, String value, String result, String date, String person,
+                        String upload, String ypfl, String ypmc, String imgpath, String weight, String phone) {
         this.id = id;
         this.num = num;
         this.detail = detail;
@@ -42,7 +44,7 @@ public class QueryRes {
         this.phone = phone;
     }
 
-    public QueryRes() {
+    public QueryResBean() {
     }
 
     public Long getId() {

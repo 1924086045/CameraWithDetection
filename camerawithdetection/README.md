@@ -31,7 +31,7 @@
         }
                         
         @Override
-        public void resultWithProjectLists(String path, ArrayList<QueryRes> queryRes) {
+        public void resultWithProjectLists(String path, ArrayList<QueryRes> queryReBeans) {
                         
         }
     }); 
@@ -50,7 +50,7 @@
         }
                         
         @Override
-        public void resultWithProjectLists(String path, ArrayList<QueryRes> queryRes) {
+        public void resultWithProjectLists(String path, ArrayList<QueryRes> queryReBeans) {
         
         }
     });

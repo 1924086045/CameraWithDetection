@@ -1,8 +1,6 @@
 package com.zodo.camerawithdetection.callback;
 
-import com.zodo.camerawithdetection.bean.CheckSampleBean;
-import com.zodo.camerawithdetection.bean.JniBeans;
-import com.zodo.camerawithdetection.bean.QueryRes;
+import com.zodo.camerawithdetection.bean.QueryResBean;
 
 import java.util.ArrayList;
 
@@ -20,5 +18,5 @@ public interface OnResultCallback {
     /**
      * 多通道检测
      */
-    void resultWithProjectLists(String path, ArrayList<QueryRes> rowsDTOS);
+    void resultWithProjectLists(String path, Object rowsDTOS);
 }

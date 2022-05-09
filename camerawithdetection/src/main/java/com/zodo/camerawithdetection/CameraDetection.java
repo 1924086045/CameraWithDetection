@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 
 import com.zodo.camerawithdetection.activity.CameraActivity;
-import com.zodo.camerawithdetection.bean.CheckSampleBean;
 import com.zodo.camerawithdetection.bean.DetectionProject;
-import com.zodo.camerawithdetection.bean.JniBeans;
-import com.zodo.camerawithdetection.bean.QueryRes;
+import com.zodo.camerawithdetection.bean.QueryResBean;
 import com.zodo.camerawithdetection.callback.OnResultCallback;
 import com.zodo.camerawithdetection.common.CommonString;
 import com.zodo.camerawithdetection.utils.OnResultRequest;
@@ -33,7 +31,7 @@ public class CameraDetection {
 
     private ArrayList<DetectionProject> detectionProjects;//检测项目列表
 
-    private ArrayList<QueryRes> listData;//多通道列表
+    private ArrayList<QueryResBean> listData;//多通道列表
 
     public static Builder builder(Activity activity) {
         return new Builder(activity);
@@ -91,7 +89,7 @@ public class CameraDetection {
          * 多通道列表
          */
         public Builder setMultiList(Object list) {
-            detection.listData = (ArrayList<QueryRes>) list;
+            detection.listData = (ArrayList<QueryResBean>) list;
             return this;
         }
 
@@ -111,12 +109,12 @@ public class CameraDetection {
                     if (resultCode == Activity.RESULT_OK) {
                         String path = data.getExtras().getString(CommonString.CAMERA_PHOTO, "");
                         //进行数据比对后直接返回检测结果
-                        ArrayList<QueryRes> queryRes = (ArrayList<QueryRes>) data.getExtras().getSerializable(CommonString.RESULT_LISTS);
+                        ArrayList<QueryResBean> queryReBeans = (ArrayList<QueryResBean>) data.getExtras().getSerializable(CommonString.RESULT_LISTS);
                         if (detection.isMultiChannel) {
-                            resultCallback.resultWithProjectLists(path, queryRes);
+                            resultCallback.resultWithProjectLists(path, queryReBeans);
                         } else {
-                            if (queryRes != null && !queryRes.isEmpty()) {
-                                QueryRes rowsDTO = queryRes.get(0);
+                            if (queryReBeans != null && !queryReBeans.isEmpty()) {
+                                QueryResBean rowsDTO = queryReBeans.get(0);
                                 resultCallback.resultWithProject(path, rowsDTO.getValue(), rowsDTO.getResult());
                             } else {
                                 resultCallback.resultWithProject(path, "", "");

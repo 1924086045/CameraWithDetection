@@ -8,10 +8,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.zodo.camerawithdetection.CameraDetection;
-import com.zodo.camerawithdetection.bean.CheckSampleBean;
 import com.zodo.camerawithdetection.bean.DetectionProject;
-import com.zodo.camerawithdetection.bean.JniBeans;
-import com.zodo.camerawithdetection.bean.QueryRes;
+import com.zodo.camerawithdetection.bean.QueryResBean;
 import com.zodo.camerawithdetection.callback.OnResultCallback;
 import com.zodo.camerawithdetection.common.DetectionType;
 
@@ -48,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void resultWithProjectLists(String path, ArrayList<QueryRes> queryRes) {
+                            public void resultWithProjectLists(String path, Object queryReBeans) {
 
                             }
                         });
@@ -67,11 +65,11 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<DetectionProject> projects=new ArrayList<>();
                 projects.add(project);
 
-                ArrayList<QueryRes> listData=new ArrayList<>();
+                ArrayList<QueryResBean> listData=new ArrayList<>();
                 for (int i = 0; i < 4; i++) {
-                    QueryRes queryRes = new QueryRes(null, "1", "", "", "",
+                    QueryResBean queryResBean = new QueryResBean(null, "1", "", "", "",
                             project.getProjectname(), "", "", "", "", "0", "", "", "", "", "");
-                    listData.add(queryRes);
+                    listData.add(queryResBean);
                 }
 
                 CameraDetection.builder(MainActivity.this)
@@ -86,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void resultWithProjectLists(String path, ArrayList<QueryRes> queryRes) {
+                            public void resultWithProjectLists(String path, Object queryReBeans) {
                                 Log.e("path",path);
                             }
                         });
