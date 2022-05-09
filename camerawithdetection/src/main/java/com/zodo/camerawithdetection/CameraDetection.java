@@ -74,24 +74,24 @@ public class CameraDetection {
         /**
          * 单通道检测项目
          */
-        public Builder setDetectionProject(DetectionProject project) {
-            detection.detectionProject = project;
+        public Builder setDetectionProject(Object project) {
+            detection.detectionProject = (DetectionProject) project;
             return this;
         }
 
         /**
          * 检测项目列表
          */
-        public Builder setDetectionProjectList(ArrayList<DetectionProject> projects) {
-            detection.detectionProjects = projects;
+        public Builder setDetectionProjectList(Object projects) {
+            detection.detectionProjects = (ArrayList<DetectionProject>) projects;
             return this;
         }
 
         /**
          * 多通道列表
          */
-        public Builder setMultiList(ArrayList<QueryRes> list) {
-            detection.listData = list;
+        public Builder setMultiList(Object list) {
+            detection.listData = (ArrayList<QueryRes>) list;
             return this;
         }
 
