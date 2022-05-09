@@ -82,8 +82,9 @@ public class CameraDetection {
         /**
          * 检测项目列表
          */
-        public Builder setDetectionProjectList(Object projects) {
-            detection.detectionProjects = (ArrayList<DetectionProject>) projects;
+        public Builder setDetectionProjectList(String projects) {
+            ArrayList<DetectionProject> detectionProjects=new Gson().fromJson(projects,new TypeToken<ArrayList<DetectionProject>>(){}.getType());
+            detection.detectionProjects = new ArrayList<>(detectionProjects);
             return this;
         }
 
@@ -114,7 +115,8 @@ public class CameraDetection {
                         //进行数据比对后直接返回检测结果
                         ArrayList<QueryResBean> queryReBeans = (ArrayList<QueryResBean>) data.getExtras().getSerializable(CommonString.RESULT_LISTS);
                         if (detection.isMultiChannel) {
-                            resultCallback.resultWithProjectLists(path, queryReBeans);
+                            String multiList=new Gson().toJson(queryReBeans);
+                            resultCallback.resultWithProjectLists(path, multiList);
                         } else {
                             if (queryReBeans != null && !queryReBeans.isEmpty()) {
                                 QueryResBean rowsDTO = queryReBeans.get(0);

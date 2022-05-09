@@ -18,5 +18,5 @@ public interface OnResultCallback {
     /**
      * 多通道检测
      */
-    void resultWithProjectLists(String path, Object rowsDTOS);
+    void resultWithProjectLists(String path, String rowsDTOS);
 }

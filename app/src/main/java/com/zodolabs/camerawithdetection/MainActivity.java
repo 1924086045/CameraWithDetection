@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void resultWithProjectLists(String path, Object queryReBeans) {
+                            public void resultWithProjectLists(String path, String queryReBeans) {
 
                             }
                         });
@@ -75,10 +75,12 @@ public class MainActivity extends AppCompatActivity {
 
                 String gson=new Gson().toJson(listData);
 
+                String projectStr=new Gson().toJson(projects);
+
                 CameraDetection.builder(MainActivity.this)
                         .setMultiChannel(true)
                         .setDetectionType(DetectionType.JIAO_JIN_TI)
-                        .setDetectionProjectList(projects)
+                        .setDetectionProjectList(projectStr)
                         .setMultiList(gson)
                         .build(new OnResultCallback() {
                             @Override
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void resultWithProjectLists(String path, Object queryReBeans) {
+                            public void resultWithProjectLists(String path, String queryReBeans) {
                                 Log.e("path",path);
                             }
                         });
