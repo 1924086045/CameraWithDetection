@@ -21,6 +21,8 @@ import java.util.ArrayList;
  */
 public class CameraDetection {
 
+    private Gson gson;
+
     private WeakReference<Activity> activity;
 
     private int cameraID;//摄像头id
@@ -44,6 +46,7 @@ public class CameraDetection {
         private CameraDetection detection = new CameraDetection();
 
         private Builder(Activity activity) {
+            detection.gson=new Gson();
             detection.activity = new WeakReference<>(activity);
         }
 
@@ -74,8 +77,8 @@ public class CameraDetection {
         /**
          * 单通道检测项目
          */
-        public Builder setDetectionProject(Object project) {
-            detection.detectionProject = (DetectionProject) project;
+        public Builder setDetectionProject(String project) {
+            detection.detectionProject = detection.gson.fromJson(project,DetectionProject.class);
             return this;
         }
 
@@ -83,7 +86,7 @@ public class CameraDetection {
          * 检测项目列表
          */
         public Builder setDetectionProjectList(String projects) {
-            ArrayList<DetectionProject> detectionProjects=new Gson().fromJson(projects,new TypeToken<ArrayList<DetectionProject>>(){}.getType());
+            ArrayList<DetectionProject> detectionProjects=detection.gson.fromJson(projects,new TypeToken<ArrayList<DetectionProject>>(){}.getType());
             detection.detectionProjects = new ArrayList<>(detectionProjects);
             return this;
         }
@@ -92,7 +95,7 @@ public class CameraDetection {
          * 多通道列表
          */
         public Builder setMultiList(String list) {
-            ArrayList<QueryResBean> queryResBeans=new Gson().fromJson(list,new TypeToken<ArrayList<QueryResBean>>(){}.getType());
+            ArrayList<QueryResBean> queryResBeans=detection.gson.fromJson(list,new TypeToken<ArrayList<QueryResBean>>(){}.getType());
             detection.listData = new ArrayList<>(queryResBeans);
             return this;
         }

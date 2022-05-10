@@ -37,9 +37,10 @@ public class MainActivity extends AppCompatActivity {
                 project.setProjectmethod("比色");
                 project.setProjectname("孔雀石绿(比色)");
                 project.setYuzhi(0.8);
+                String gsonProject=new Gson().toJson(project);
                 CameraDetection.builder(MainActivity.this)
                         .setMultiChannel(false)
-                        .setDetectionProject(project)
+                        .setDetectionProject(gsonProject)
                         .build(new OnResultCallback() {
                             @Override
                             public void resultWithProject(String path, String checkValue, String checkResult) {
