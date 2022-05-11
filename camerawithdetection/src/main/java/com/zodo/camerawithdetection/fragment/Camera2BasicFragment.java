@@ -936,9 +936,11 @@ public class Camera2BasicFragment extends Fragment
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            while (mBitmap.length>0){
-                                setIntentResult();
-                                break;
+                            while (true){
+                                if (mBitmap.length>0) {
+                                    setIntentResult();
+                                    break;
+                                }
                             }
                         }
                     }).start();
