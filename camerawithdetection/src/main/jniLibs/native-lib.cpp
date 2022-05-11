@@ -1857,3 +1857,112 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionNongcan(JNIEn
     env->ReleaseIntArrayElements(data_, data, 0);
     return env->NewStringUTF(ss.str().c_str());
 }
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_zodolabs_zld_jxnsjg_ui_jiance_handle_JianceHandler_detectionNongcan(JNIEnv *env,
+                                                                             jobject instance,
+                                                                             jintArray data_,
+                                                                             jint width,
+                                                                             jint height) {
+
+    jint *data = env->GetIntArrayElements(data_, NULL);
+    if (data == NULL) {
+        return nullptr;
+    }
+    Mat src(height, width, CV_8UC4, (unsigned char *) data);
+    cvtColor(src, src, COLOR_BGRA2BGR);
+    Mat grey, binImg;
+    cvtColor(src, grey, COLOR_BGR2GRAY);
+    threshold(grey, binImg, 0, 255, THRESH_OTSU);
+    vector<vector<Point>> squares;
+    Rect roiRect;
+    findContours(binImg, squares, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    for (vector<Point> square:squares) {
+        RotatedRect box = minAreaRect(square);
+        if (box.boundingRect().width > 730 && box.boundingRect().width < 930 &&
+            box.boundingRect().height < 420 &&
+            box.boundingRect().height > 320) {
+            roiRect = box.boundingRect();
+        }
+    }
+    if (roiRect.empty()) {
+        return env->NewStringUTF("none");
+    }
+    cout << roiRect << endl;
+    Mat roi = src(roiRect);
+    Rect rect = Rect(450, 50, 720 - 450, 330 - 50);
+    Mat roi2 = roi(rect);
+    blur(roi2, roi2, Size(15, 15));
+    /*   GaussianBlur(roi2, roi2, Size(15, 15), 0);
+       Mat hcres;
+       cvtColor(roi2, hcres, COLOR_BGR2HSV);
+       int total = 0;
+       int num = 0;
+       for (int k = 0; k < hcres.rows; k++) {
+           for (int j = 0; j < hcres.cols; j++) {
+               Vec3b data = hcres.at<Vec3b>(k, j);
+               if (data[0] > 140 && data[1] < 60 && data[2] > 160 && data[2] < 255) {
+                   roi2.at<Vec3b>(k, j)[0] = 255;
+                   roi2.at<Vec3b>(k, j)[1] = 255;
+                   roi2.at<Vec3b>(k, j)[2] = 255;
+               } else {
+                   num++;
+               }
+           }
+       }
+       cout << num << endl;
+       if (num < 10000) {
+           cout << "白卡" << endl;
+       }
+       Mat greyMat;
+       cvtColor(roi2, greyMat, COLOR_BGR2GRAY);
+       for (int k = 0; k < hcres.rows; k++) {
+           for (int j = 0; j < hcres.cols; j++) {
+               uchar data = greyMat.at<uchar>(k, j);
+               int value = 255-data;
+               total += value;
+           }
+       }
+       float resultvalue = (float)total/(280*270);*/
+
+    Mat greyroi, resImg;
+    cvtColor(roi2, greyroi, COLOR_BGR2GRAY);
+    Rect dstrect(130 - 50, 140 - 50, 100, 100);
+    Mat dstimg = roi2(dstrect);
+
+    Rect maskrect(0, 0, 20, 20);
+    Mat maskimg = roi2(maskrect);
+    resize(maskimg, maskimg, Size(100, 100));
+    Mat aux = -dstimg + maskimg;
+
+    Mat haux;
+    cvtColor(aux, haux, COLOR_BGR2HSV);
+    for (int k = 0; k < haux.rows; k++) {
+        for (int j = 0; j < haux.cols; j++) {
+            Vec3b data = haux.at<Vec3b>(k, j);
+            if (data[2] < 38 || (data[1] < 43 && data[2] > 46)) {
+                aux.at<Vec3b>(k, j)[0] = 0;
+                aux.at<Vec3b>(k, j)[1] = 0;
+                aux.at<Vec3b>(k, j)[2] = 0;
+            }
+        }
+    }
+
+    int total = 0;
+    for (int i = 0; i < aux.rows; i++) {
+        for (int j = 0; j < aux.cols; j++) {
+            uchar data = aux.at<uchar>(i, j);
+            total += (int) data;
+        }
+    }
+    float resultvalue = total / (100 * 100) ;
+    if (resultvalue < 0) {
+        resultvalue = 0;
+    }
+
+    stringstream ss;
+    ss << resultvalue;
+    env->ReleaseIntArrayElements(data_, data, 0);
+    return env->NewStringUTF(ss.str().c_str());
+}

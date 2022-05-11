@@ -932,7 +932,17 @@ public class Camera2BasicFragment extends Fragment
 //                    showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
-                    setIntentResult();
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            while (mBitmap.length>0){
+                                setIntentResult();
+                                break;
+                            }
+                        }
+                    }).start();
+
                 }
             };
 
