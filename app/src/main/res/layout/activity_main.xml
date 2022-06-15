@@ -7,6 +7,18 @@
     android:orientation="vertical"
     android:gravity="center">
 
+    <TextView
+        android:id="@+id/tv_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
+        android:id="@+id/btn_nc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="农残单通道检测" />
+
     <Button
         android:id="@+id/btn_project"
         android:layout_width="wrap_content"
@@ -18,5 +30,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="返回多通道数据" />
+
+    <Button
+        android:id="@+id/btn_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止循环" />
 
 </LinearLayout>

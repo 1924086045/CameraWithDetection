@@ -254,7 +254,10 @@ public final class ImageUtils {
      * @return bitmap
      */
     public static Bitmap getBitmap(final byte[] data, final int offset) {
-        if (data.length == 0) return null;
+        if (data.length == 0){
+            return null;
+        }
+
         return BitmapFactory.decodeByteArray(data, offset, data.length);
     }
 

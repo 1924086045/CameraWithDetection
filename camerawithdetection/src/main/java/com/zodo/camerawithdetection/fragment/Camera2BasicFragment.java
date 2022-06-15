@@ -96,6 +96,10 @@ public class Camera2BasicFragment extends Fragment
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
 
+    private static boolean isBitmapSave=false;
+
+    private static boolean isFirstEnd=true;
+
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -240,6 +244,8 @@ public class Camera2BasicFragment extends Fragment
     @Override
     public void onStart() {
         mBitmap=new byte[0];
+        isBitmapSave=false;
+        isFirstEnd=true;
         super.onStart();
     }
 
@@ -267,7 +273,7 @@ public class Camera2BasicFragment extends Fragment
      * This a callback object for the {@link ImageReader}. "onImageAvailable" will be called when a
      * still image is ready to be saved.
      */
-    private final ImageReader.OnImageAvailableListener mOnImageAvailableListener
+    private ImageReader.OnImageAvailableListener mOnImageAvailableListener
             = new ImageReader.OnImageAvailableListener() {
 
         @Override
@@ -472,7 +478,7 @@ public class Camera2BasicFragment extends Fragment
             public void run() {
                 takePicture();
             }
-        },1500);
+        },3000);
     }
 
     @Override
@@ -609,7 +615,6 @@ public class Camera2BasicFragment extends Fragment
                 if (maxPreviewHeight > MAX_PREVIEW_HEIGHT) {
                     maxPreviewHeight = MAX_PREVIEW_HEIGHT;
                 }
-
 
                 Log.d(TAG, maxPreviewHeight + ", " + maxPreviewWidth + ","+rotatedPreviewHeight + "," + rotatedPreviewWidth);
                 Size largest2 = new Size(largest.getWidth()/4,largest.getHeight()/4);
@@ -755,8 +760,8 @@ public class Camera2BasicFragment extends Fragment
                             mCaptureSession = cameraCaptureSession;
                             try {
                                 // Auto focus should be continuous for camera preview.
-                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                                        CaptureRequest.CONTROL_AF_MODE_MACRO);
+//                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+//                                        CaptureRequest.CONTROL_AF_MODE_MACRO);
 //                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,getFPSRange());
 
                                 // Flash is automatically enabled when necessary.
@@ -913,8 +918,8 @@ public class Camera2BasicFragment extends Fragment
             captureBuilder.addTarget(mImageReader.getSurface());
 
             // Use the same AE and AF modes as the preview.
-            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                    CaptureRequest.CONTROL_AF_MODE_MACRO);
+//            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+//                    CaptureRequest.CONTROL_AF_MODE_MACRO);
 //            captureBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,getFPSRange());
             setAutoFlash(captureBuilder);
 
@@ -931,19 +936,8 @@ public class Camera2BasicFragment extends Fragment
                                                @NonNull TotalCaptureResult result) {
 //                    showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
-                    unlockFocus();
 
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            while (true){
-                                if (mBitmap.length>0) {
-                                    setIntentResult();
-                                    break;
-                                }
-                            }
-                        }
-                    }).start();
+                    goToEnd();
 
                 }
             };
@@ -953,6 +947,15 @@ public class Camera2BasicFragment extends Fragment
             mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void goToEnd(){
+        if (isBitmapSave&&isFirstEnd) {
+            unlockFocus();
+            isFirstEnd=false;
+            isBitmapSave=false;
+            setIntentResult();
         }
     }
 
@@ -1018,7 +1021,7 @@ public class Camera2BasicFragment extends Fragment
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
-    private static class ImageSaver implements Runnable {
+    private class ImageSaver implements Runnable {
 
         /**
          * The JPEG image
@@ -1056,6 +1059,8 @@ public class Camera2BasicFragment extends Fragment
                 }
             }
             mBitmap=bytes;
+            isBitmapSave=true;
+            goToEnd();
         }
 
     }

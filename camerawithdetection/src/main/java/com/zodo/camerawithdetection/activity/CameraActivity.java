@@ -41,9 +41,11 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
         System.loadLibrary("native-lib");
     }
 
-    public native ArrayList<JniBeans> detection(int[] data, int width, int height, String imagePath);
+    public native ArrayList<JniBeans> detection(int[] data, int width, int height, String imagePath,boolean isJGD,int minThresheold,int maxThresheold);
 
     public native String detectionNongcan(int[] data, int width, int height);
+
+    public native String detectionJGDNongcan(int[] data, int width, int height, String imagePath);
 
     public native String detectionPCR(int[] data, int width, int height);
 
@@ -64,6 +66,13 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
     private Date date;
     private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
 
+    private String imagepath="";//图片路径
+
+    private boolean isJianGuanYi=true;//是否为监管仪
+
+    private int minThresheold=25;  //图像检索最小阈值
+    private int maxThresheold=55;  //图像检索最大阈值
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +84,15 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
         mProject = (DetectionProject) getIntent().getExtras().getSerializable(CommonString.DETECTION_PROJECT);
         detectionProjects = (ArrayList<DetectionProject>) getIntent().getExtras().getSerializable(CommonString.DETECTION_PROJECT_LISTS);
         listData = (ArrayList<QueryResBean>) getIntent().getExtras().getSerializable(CommonString.MULTI_CHANNEL_LISTS);
+        minThresheold=getIntent().getIntExtra("minThresheold",35);
+        maxThresheold=getIntent().getIntExtra("maxThresheold",85);
+
+        String dirpath = String.valueOf(new Date().getTime());
+        imagepath = CommonUtils.getImgpath() + File.separator + dirpath;
+        File file = new File(imagepath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
 
         if (!isMultiChannel && listData == null) {
             //如果为单通道默认生成一个实体
@@ -98,11 +116,8 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
     private void getImagePath(byte[] bytes) {
         String path = "";
         Bitmap picBitmap = null;
-        String imagepath = "";
         if (bytes.length >= 1000) {
             picBitmap = ImageUtils.getBitmap(bytes, 0);
-            String dirpath = String.valueOf(new Date().getTime());
-            imagepath = CommonUtils.getImgpath() + File.separator + dirpath;
             path = imagepath + "/gg.jpg";
             ImageUtils.save(picBitmap, path, Bitmap.CompressFormat.JPEG);
         }
@@ -128,7 +143,20 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                 break;
             default:
                 //默认为胶金体
-                getDetectionResult(picBitmap, imagepath, path);
+                if (isJianGuanYi){
+                    if (isMultiChannel){
+
+                    }else {
+                        if (mProject.getId()==24||mProject.getId()==51){
+                            //监管端农药残留检测
+                            getDetectionJGDNcResult(picBitmap,imagepath, path);
+                        }else {
+                            getDetectionResult(picBitmap, imagepath, path);
+                        }
+                    }
+                }else {
+                    getDetectionResult(picBitmap, imagepath, path);
+                }
                 break;
 
         }
@@ -155,7 +183,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
             picBitmap.getPixels(pixs, 0, width, 0, 0, width, height);
             ArrayList<JniBeans> list = null;
             try {
-                list = detection(pixs, width, height, imagepath);
+                list = detection(pixs, width, height, imagepath,true,minThresheold,maxThresheold);
                 if (list != null && list.size() > 0) {
                     Collections.reverse(list);
                     boolean isAllRight = true;
@@ -163,17 +191,19 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                         JniBeans bean = list.get(i);
                         QueryResBean resData = listData.get(i);
                         resData.setImgpath(bean.getPath());
-                        Uri imgUri = new Uri.Builder().path(bean.getPro()).build();
-                        String proRes = CodeUtils.parseCode(imgUri.getPath());
-                        if (TextUtils.isEmpty(proRes)) {
-                            proRes = XQRCode.analyzeQRCode(imgUri.getPath());
-                        }
-                        if (TextUtils.isEmpty(proRes)) {
-                            try {
-                                proRes = QRUtils.getInstance().decodeQRcode(imgUri.getPath());
-                            } catch (Exception e) {
-                                proRes = "";
-                                e.printStackTrace();
+                        String proRes="";
+                        if (!isJianGuanYi) {
+                            Uri imgUri = new Uri.Builder().path(bean.getPro()).build();
+                            proRes = CodeUtils.parseCode(imgUri.getPath());
+                            if (TextUtils.isEmpty(proRes)) {
+                                proRes = XQRCode.analyzeQRCode(imgUri.getPath());
+                            }
+                            if (TextUtils.isEmpty(proRes)) {
+                                try {
+                                    proRes = QRUtils.getInstance().decodeQRcode(imgUri.getPath());
+                                } catch (Exception e) {
+                                    proRes = "";
+                                }
                             }
                         }
                         try {
@@ -343,6 +373,40 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                         resData.setProject(resData.getProject());
                     }
                     resData.setDate(format.format(new Date()));
+                }
+                setIntentValueResult(path, listData);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            setErrorListResult(path);
+        }
+    }
+
+    /**
+     * 监管端-农药残留检测
+     */
+    private void getDetectionJGDNcResult(Bitmap picBitmap,String imagepath, String path){
+        try {
+            if (picBitmap == null || TextUtils.isEmpty(path)) {
+                setErrorListResult(path);
+            } else {
+                int width = picBitmap.getWidth();
+                int height = picBitmap.getHeight();
+                Log.d("MainActivity", "width: " + width + " ,height: " + height);
+                int[] pixs = new int[width * height];
+                picBitmap.getPixels(pixs, 0, width, 0, 0, width, height);
+                String result = detectionJGDNongcan(pixs, width, height,imagepath);
+                if ("none".equals(result)) {
+                    setErrorListResult(path);
+                    return;
+                }
+                double vt = Double.parseDouble(result);
+                listData.get(0).setDate(format.format(new Date()));
+                listData.get(0).setValue(String.format("%.2f", vt));
+                if (mProject.getYuzhi() > vt) {
+                    listData.get(0).setResult("不合格");
+                } else {
+                    listData.get(0).setResult("合格");
                 }
                 setIntentValueResult(path, listData);
             }
