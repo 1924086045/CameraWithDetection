@@ -1957,16 +1957,19 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
     vector<vector<Point>> squares;
     Rect roiRect;
 
+    int kvalue=15;
 //    normalize(grey, grey, 255, 0, NORM_MINMAX);
-//    Canny(grey, grey, 60, 120, 3, true);
+    blur(grey,grey,Size(3,3));
+    Canny(grey, grey, 30, 70, 3, true);
 //    Laplacian(grey, grey, CV_8U, 5, 1, 0, BORDER_DEFAULT);
+    blur(grey,grey,Size(3,3));
 
     findContours(grey, squares, RETR_LIST, CHAIN_APPROX_SIMPLE);
     vector<Rect> rects;
 
     vector<Vec3f> circles;
     Mat srcImage;
-    HoughCircles(grey, circles, HOUGH_GRADIENT, 1, 10, 85, 35, 30, 90);
+    HoughCircles(grey, circles, HOUGH_GRADIENT, 1, 5, 80, 35, 60, 100);
     int radius=50;
 
     string imagePath = env->GetStringUTFChars(imagePath_, 0);
@@ -1988,11 +1991,13 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
     for (int i = 0; i < circles.size(); i++){
         Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
 
-        radius = cvRound(circles[i][2]);
-        if (center.x>300&&radius>50&&radius<80){
+        int rads = cvRound(circles[i][2]);
+        if (center.x>300&&rads>65&&rads<70){
+            radius = cvRound(circles[i][2]);
 //            srcImage=Mat(Size(radius*2,radius*2),CV_8UC3);
             Rect rect(Point(center.x-radius,center.y-radius),Point(center.x+radius,center.y+radius));
             roiRect=rect;
+            rects.push_back(rect);
         }
 
         //绘制圆轮廓
@@ -2022,10 +2027,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
 
     Mat greyroi, resImg;
     cvtColor(roi2, greyroi, COLOR_BGR2GRAY);
-    int rad=radius*2-20;
-    if (radius*2-20>roi2.cols){
-        rad=roi2.cols-20;
-    }
+    int rad=100;
     Rect dstrect(20, 20, rad, rad);
     Mat dstimg = roi2(dstrect);
 
@@ -2039,7 +2041,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
     for (int k = 0; k < haux.rows; k++) {
         for (int j = 0; j < haux.cols; j++) {
             Vec3b data = haux.at<Vec3b>(k, j);
-            if (data[2] < 20 || (data[1] < 43 && data[2] > 46)) {
+            if (data[2] < 30 || (data[1] < 43 && data[2] > 46)) {
                 aux.at<Vec3b>(k, j)[0] = 0;
                 aux.at<Vec3b>(k, j)[1] = 0;
                 aux.at<Vec3b>(k, j)[2] = 0;
