@@ -70,8 +70,8 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
 
     private boolean isJianGuanYi=false;//是否为监管仪
 
-    private int minThresheold=25;  //图像检索最小阈值
-    private int maxThresheold=55;  //图像检索最大阈值
+    private int minThresheold=35;  //图像检索最小阈值
+    private int maxThresheold=85;  //图像检索最大阈值
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
