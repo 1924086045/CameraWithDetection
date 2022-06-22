@@ -68,7 +68,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
 
     private String imagepath="";//图片路径
 
-    private boolean isJianGuanYi=true;//是否为监管仪
+    private boolean isJianGuanYi=false;//是否为监管仪
 
     private int minThresheold=25;  //图像检索最小阈值
     private int maxThresheold=55;  //图像检索最大阈值
