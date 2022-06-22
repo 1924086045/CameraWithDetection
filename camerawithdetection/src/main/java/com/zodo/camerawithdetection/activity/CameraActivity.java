@@ -183,7 +183,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
             picBitmap.getPixels(pixs, 0, width, 0, 0, width, height);
             ArrayList<JniBeans> list = null;
             try {
-                list = detection(pixs, width, height, imagepath,true,minThresheold,maxThresheold);
+                list = detection(pixs, width, height, imagepath,false,minThresheold,maxThresheold);
                 if (list != null && list.size() > 0) {
                     Collections.reverse(list);
                     boolean isAllRight = true;
