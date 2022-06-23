@@ -275,6 +275,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                 String proRes = "24";
                 for (int i = 0; i < stringList.size(); i++) {
                     QueryResBean resData = listData.get(i);
+                    resData.setImgpath(path);
                     DetectionProject detectionProject = getDetectionProject(proRes, resData.getProject());
                     double yuzhi = detectionProject.getYuzhi();
                     if ("".equals(resData.getYpmc())) {
@@ -319,6 +320,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                 Collections.reverse(stringList);
                 for (int i = 0; i < stringList.size(); i++) {
                     QueryResBean resData = listData.get(i);
+                    resData.setImgpath(path);
                     resData.setValue(stringList.get(i));
                     int value = Integer.valueOf(stringList.get(i));
                     if (value < 34 && value > 10) {
@@ -360,6 +362,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                 }
                 for (int i = 0; i < stringList.size(); i++) {
                     QueryResBean resData = listData.get(i);
+                    resData.setImgpath(path);
                     if (resData.getYpmc().equals("")) {
                         continue;
                     }
