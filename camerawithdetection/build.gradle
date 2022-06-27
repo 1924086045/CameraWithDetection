@@ -86,7 +86,7 @@ project.afterEvaluate {
                 groupId = 'com.zodo.camerawithdetection'//你要发布的库的组ID  建议使用包名
                 artifactId "cameraWithDetection"
                 from components.release
-                version = 'v1.5.3'
+                version = 'v1.5.4'
             }
         }
     }
