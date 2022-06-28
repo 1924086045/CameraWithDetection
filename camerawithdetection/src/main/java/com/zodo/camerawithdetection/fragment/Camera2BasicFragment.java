@@ -113,6 +113,8 @@ public class Camera2BasicFragment extends Fragment
 
     private int cameraID;
 
+    private boolean isJianGuanYi;
+
     /**
      * Tag for the {@link Log}.
      */
@@ -452,11 +454,12 @@ public class Camera2BasicFragment extends Fragment
         }
     }
 
-    public static Camera2BasicFragment newInstance(CameraCallBack callBack,int cameraId) {
+    public static Camera2BasicFragment newInstance(CameraCallBack callBack,int cameraId,boolean isJianGuanYi) {
         Camera2BasicFragment fragment=new Camera2BasicFragment();
         cameraCallBack=callBack;
         Bundle bundle=new Bundle();
         bundle.putInt("CAMERA_ID",cameraId);
+        bundle.putBoolean("isJianGuanYi",isJianGuanYi);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -473,6 +476,7 @@ public class Camera2BasicFragment extends Fragment
 //        view.findViewById(R.id.info).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         cameraID=getArguments().getInt(CommonString.CAMERA_ID,0);
+        isJianGuanYi=getArguments().getBoolean("isJianGuanYi",false);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -760,8 +764,10 @@ public class Camera2BasicFragment extends Fragment
                             mCaptureSession = cameraCaptureSession;
                             try {
                                 // Auto focus should be continuous for camera preview.
-                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                                        CaptureRequest.CONTROL_AF_MODE_MACRO);
+                                if (!isJianGuanYi) {
+                                    mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+                                            CaptureRequest.CONTROL_AF_MODE_MACRO);
+                                }
 //                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,getFPSRange());
 
                                 // Flash is automatically enabled when necessary.
@@ -918,8 +924,10 @@ public class Camera2BasicFragment extends Fragment
             captureBuilder.addTarget(mImageReader.getSurface());
 
             // Use the same AE and AF modes as the preview.
-            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                    CaptureRequest.CONTROL_AF_MODE_MACRO);
+            if (!isJianGuanYi) {
+                captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+                        CaptureRequest.CONTROL_AF_MODE_MACRO);
+            }
 //            captureBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,getFPSRange());
             setAutoFlash(captureBuilder);
 

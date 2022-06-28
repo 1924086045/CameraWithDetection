@@ -70,8 +70,8 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
 
     private boolean isJianGuanYi=false;//是否为监管仪
 
-    private int minThresheold=35;  //图像检索最小阈值
-    private int maxThresheold=85;  //图像检索最大阈值
+    private int minThresheold=25;  //图像检索最小阈值
+    private int maxThresheold=55;  //图像检索最大阈值
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +84,9 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
         mProject = (DetectionProject) getIntent().getExtras().getSerializable(CommonString.DETECTION_PROJECT);
         detectionProjects = (ArrayList<DetectionProject>) getIntent().getExtras().getSerializable(CommonString.DETECTION_PROJECT_LISTS);
         listData = (ArrayList<QueryResBean>) getIntent().getExtras().getSerializable(CommonString.MULTI_CHANNEL_LISTS);
-        minThresheold=getIntent().getIntExtra("minThresheold",35);
-        maxThresheold=getIntent().getIntExtra("maxThresheold",85);
+        minThresheold=getIntent().getIntExtra(CommonString.MIN_THRESHEOLD,25);
+        maxThresheold=getIntent().getIntExtra(CommonString.MAX_THRESHEOLD,55);
+        isJianGuanYi=getIntent().getBooleanExtra(CommonString.IS_JIAN_GUAN_YI,false);
 
         String dirpath = String.valueOf(new Date().getTime());
         imagepath = CommonUtils.getImgpath() + File.separator + dirpath;
@@ -105,7 +106,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
 
         if (null == savedInstanceState) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, Camera2BasicFragment.newInstance(this, cameraId))
+                    .replace(R.id.container, Camera2BasicFragment.newInstance(this, cameraId,isJianGuanYi))
                     .commit();
         }
     }
@@ -183,7 +184,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
             picBitmap.getPixels(pixs, 0, width, 0, 0, width, height);
             ArrayList<JniBeans> list = null;
             try {
-                list = detection(pixs, width, height, imagepath,false,minThresheold,maxThresheold);
+                list = detection(pixs, width, height, imagepath,isJianGuanYi,minThresheold,maxThresheold);
                 if (list != null && list.size() > 0) {
                     Collections.reverse(list);
                     boolean isAllRight = true;

@@ -37,6 +37,11 @@ public class CameraDetection {
 
     private ArrayList<QueryResBean> listData;//多通道列表
 
+    private boolean isJianGuanYi;//是否为监管仪
+
+    private int minThresheold;  //图像检索最小阈值
+    private int maxThresheold;  //图像检索最大阈值
+
     public static Builder builder(Activity activity) {
         return new Builder(activity);
     }
@@ -75,6 +80,36 @@ public class CameraDetection {
         }
 
         /**
+         * 是否为监管仪
+         * @param isJianGuanYi
+         * @return
+         */
+        public Builder setIsJianGuanYi(boolean isJianGuanYi){
+            detection.isJianGuanYi=isJianGuanYi;
+            return this;
+        }
+
+        /**
+         * 图像检索最小阈值
+         * @param minThresheold
+         * @return
+         */
+        public Builder setMinThresheold(int minThresheold){
+            detection.minThresheold=minThresheold;
+            return this;
+        }
+
+        /**
+         * 图像检索最大阈值
+         * @param maxThresheold
+         * @return
+         */
+        public Builder setMaxThresheold(int maxThresheold){
+            detection.maxThresheold=maxThresheold;
+            return this;
+        }
+
+        /**
          * 单通道检测项目
          */
         public Builder setDetectionProject(String project) {
@@ -105,6 +140,9 @@ public class CameraDetection {
             intent.putExtra(CommonString.CAMERA_ID, detection.cameraID);
             intent.putExtra(CommonString.DETECTION_TYPE, detection.detectionType);
             intent.putExtra(CommonString.IS_MULTI_CHANNEL, detection.isMultiChannel);
+            intent.putExtra(CommonString.IS_JIAN_GUAN_YI, detection.isJianGuanYi);
+            intent.putExtra(CommonString.MIN_THRESHEOLD, detection.minThresheold);
+            intent.putExtra(CommonString.MAX_THRESHEOLD, detection.maxThresheold);
             intent.putExtra(CommonString.DETECTION_PROJECT, (Serializable) detection.detectionProject);
             intent.putExtra(CommonString.DETECTION_PROJECT_LISTS, (Serializable) detection.detectionProjects);
             intent.putExtra(CommonString.MULTI_CHANNEL_LISTS, (Serializable) detection.listData);
