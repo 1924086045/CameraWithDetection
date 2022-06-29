@@ -4,6 +4,14 @@ apply plugin: 'maven-publish'
 group='com.gitee.yyc2413'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('mykeystore.jks')
+            storePassword '445566'
+            keyAlias 'key0'
+            keyPassword '445566'
+        }
+    }
     compileSdkVersion 28
 
     defaultConfig {
@@ -14,10 +22,13 @@ android {
         versionName "1.0"
         buildToolsVersion '28.0.3'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        signingConfig signingConfigs.release
     }
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

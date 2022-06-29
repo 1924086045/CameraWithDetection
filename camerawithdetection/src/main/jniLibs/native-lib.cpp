@@ -669,11 +669,56 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //    imstr << "image.jpg";
 //    imwrite(imstr.str().c_str(), img);
 
+    //提取二维码区域轮廓
+    Mat mat_qr = m2 - m1;
+    normalize(mat_qr, mat_qr, 255, 0, NORM_MINMAX);
+    threshold(mat_qr, mat_qr, 70, 255, THRESH_BINARY_INV);
+
+    //开闭运算
+    Mat element = getStructuringElement(MORPH_RECT, Size(9, 9));
+    erode(mat_qr, mat_qr, element);
+    morphologyEx(mat_qr, mat_qr, MORPH_OPEN, element);
+    dilate(mat_qr, mat_qr, element);
+    morphologyEx(mat_qr, mat_qr, MORPH_CLOSE, element);
+
+    vector<vector<Point> > qr_contours;
+    findContours(mat_qr, qr_contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
+    vector<RotatedRect> qrAreas;
+//    if (!isLuoTiao) {
+        for (auto contour:qr_contours) {
+            auto box = minAreaRect(contour);
+            Rect rect = box.boundingRect();
+            if (isJGD){
+                if (box.center.x > 50 && box.center.x < 200 && rect.width > 110 &&
+                    rect.width < 200 &&
+                    rect.height > 110 &&
+                    rect.height < 200) {
+                    qrAreas.push_back(box);
+                }
+            } else {
+                //识别二维码区域
+                if (box.center.x > 200 && box.center.x < 480 && rect.width > 150 &&
+                    rect.width < 300 &&
+                    rect.height > 150 &&
+                    rect.height < 300) {
+//                if ((rect.width - rect.height) > -30 && (rect.width - rect.height) < 30) {
+                    qrAreas.push_back(box);
+//                }
+                }
+            }
+        }
+//    }
+
+    bool isHaveQr= false;
+    if(qrAreas.size()>0){
+        isHaveQr= true;
+    }
+
     //识别裸条区域
     bool isLuoTiao= false;
     vector<RotatedRect> areaLines;
     vector<Rect> lt_rects;
-    if (!isJGD) {
+    if (!isJGD&&!isHaveQr) {
         if (areas.size() <= 1) {
             for (auto contour:contours) {
                 auto box = minAreaRect(contour);
@@ -741,45 +786,6 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         imwrite(imagestr.str().c_str(), r);
     }
 
-    //提取二维码区域轮廓
-    Mat mat_qr = m2 - m1;
-    normalize(mat_qr, mat_qr, 255, 0, NORM_MINMAX);
-    threshold(mat_qr, mat_qr, 70, 255, THRESH_BINARY_INV);
-
-    //开闭运算
-    Mat element = getStructuringElement(MORPH_RECT, Size(9, 9));
-    erode(mat_qr, mat_qr, element);
-    morphologyEx(mat_qr, mat_qr, MORPH_OPEN, element);
-    dilate(mat_qr, mat_qr, element);
-    morphologyEx(mat_qr, mat_qr, MORPH_CLOSE, element);
-
-    vector<vector<Point> > qr_contours;
-    findContours(mat_qr, qr_contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
-    vector<RotatedRect> qrAreas;
-    if (!isLuoTiao) {
-        for (auto contour:qr_contours) {
-            auto box = minAreaRect(contour);
-            Rect rect = box.boundingRect();
-            if (isJGD){
-                if (box.center.x > 50 && box.center.x < 200 && rect.width > 110 &&
-                    rect.width < 200 &&
-                    rect.height > 110 &&
-                    rect.height < 200) {
-                    qrAreas.push_back(box);
-                }
-            } else {
-                //识别二维码区域
-                if (box.center.x > 200 && box.center.x < 480 && rect.width > 150 &&
-                    rect.width < 300 &&
-                    rect.height > 150 &&
-                    rect.height < 300) {
-//                if ((rect.width - rect.height) > -30 && (rect.width - rect.height) < 30) {
-                    qrAreas.push_back(box);
-//                }
-                }
-            }
-        }
-    }
 
     if (areas.size() == 0) {
         return nullptr;

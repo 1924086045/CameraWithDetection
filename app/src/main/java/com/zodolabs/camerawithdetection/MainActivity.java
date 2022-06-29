@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 projects.add(project);
 
                 ArrayList<QueryResBean> listData=new ArrayList<>();
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < 1; i++) {
                     QueryResBean queryResBean = new QueryResBean(null, "1", "", "", "",
                             project.getProjectname(), "", "", "", "", "0", "", "", "", "", "");
                     listData.add(queryResBean);
