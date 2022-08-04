@@ -146,7 +146,7 @@ public class CameraActivity extends AppCompatActivity implements CameraCallBack 
                 //默认为胶金体
                 if (isJianGuanYi){
                     if (isMultiChannel){
-
+                        //暂无监管仪多通道需求
                     }else {
                         if (mProject.getId()==24||mProject.getId()==51){
                             //监管端农药残留检测

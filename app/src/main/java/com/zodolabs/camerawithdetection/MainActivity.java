@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.zodo.camerawithdetection.CameraDetection;
 import com.zodo.camerawithdetection.bean.DetectionProject;
@@ -101,43 +102,83 @@ public class MainActivity extends AppCompatActivity {
         btn_project_list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DetectionProject project=new DetectionProject();
-                project.setId(1L);
-                project.setProjectmethod("比色");
-                project.setProjectname("孔雀石绿(比色)");//盐酸克伦特罗(消线)    孔雀石绿(比色)
-                project.setYuzhi(0.8);
-                ArrayList<DetectionProject> projects=new ArrayList<>();
-                projects.add(project);
-
-                ArrayList<QueryResBean> listData=new ArrayList<>();
-                for (int i = 0; i < 1; i++) {
-                    QueryResBean queryResBean = new QueryResBean(null, "1", "", "", "",
-                            project.getProjectname(), "", "", "", "", "0", "", "", "", "", "");
-                    listData.add(queryResBean);
-                }
-
-                String gson=new Gson().toJson(listData);
-
-                String projectStr=new Gson().toJson(projects);
-
-                CameraDetection.builder(MainActivity.this)
-                        .setMultiChannel(true)
-                        .setDetectionType(DetectionType.JIAO_JIN_TI)
-                        .setDetectionProjectList(projectStr)
-                        .setMultiList(gson)
-                        .build(new OnResultCallback() {
-                            @Override
-                            public void resultWithProject(String path, String checkValue, String checkResult) {
-
-                            }
-
-                            @Override
-                            public void resultWithProjectLists(String path, String queryReBeans) {
-                                Log.e("path",path);
-                            }
-                        });
+                startMutilChannel();
             }
         });
+    }
+
+    private void startMutilChannel(){
+        total++;
+        DetectionProject project=new DetectionProject();
+        project.setId(57L);
+        project.setProjectmethod("比色");
+        project.setProjectname("孔雀石绿(比色)");//盐酸克伦特罗(消线)    孔雀石绿(比色)
+        project.setYuzhi(0.8);
+
+        DetectionProject project1=new DetectionProject();
+        project1.setId(6L);
+        project1.setProjectmethod("比色");
+        project1.setProjectname("孔雀石绿(比色)");//盐酸克伦特罗(消线)    孔雀石绿(比色)
+        project1.setYuzhi(0.8);
+        ArrayList<DetectionProject> projects=new ArrayList<>();
+        projects.add(project);
+        projects.add(project1);
+
+        ArrayList<QueryResBean> listData=new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            QueryResBean queryResBean = new QueryResBean(null, (i+1)+"", "", "", "",
+                    project.getProjectname(), "", "", "", "", "0", "", "", "", "", "");
+            listData.add(queryResBean);
+        }
+
+        String gson=new Gson().toJson(listData);
+
+        String projectStr=new Gson().toJson(projects);
+
+        CameraDetection.builder(MainActivity.this)
+                .setMultiChannel(true)
+                .setMinThresheold(35)
+                .setMaxThresheold(85)
+                .setDetectionType(DetectionType.JIAO_JIN_TI)
+                .setDetectionProjectList(projectStr)
+                .setMultiList(gson)
+                .build(new OnResultCallback() {
+                    @Override
+                    public void resultWithProject(String path, String checkValue, String checkResult) {
+
+                    }
+
+                    @Override
+                    public void resultWithProjectLists(String path, String queryReBeans) {
+                        Log.e("path",path);
+                        Log.e("queryReBeans：",queryReBeans);
+                        if (!TextUtils.isEmpty(queryReBeans)) {
+                            ArrayList<QueryResBean> queryResBeans = new Gson().fromJson(queryReBeans, new TypeToken<ArrayList<QueryResBean>>() {
+                            }.getType());
+                            if (queryResBeans != null &&queryResBeans.size()==2&&
+                                    queryResBeans.get(0).getResult().equals("阴性")&&
+                                    queryResBeans.get(1).getResult().equals("疑似阳性")) {
+                                success++;
+                            }
+                        }
+
+                        DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance();
+                        decimalFormat.setMaximumFractionDigits(1);
+                        decimalFormat.setRoundingMode(RoundingMode.HALF_UP);
+                        double rate=success/total*100;
+                        tv_rate.setText("识别次数：" + (int) success + "/" + (int) total + "    " + "识别成功率：" + decimalFormat.format(rate) + "%");
+                        if (!isEnd&&total<200){
+                            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (!isEnd) {
+                                        startMutilChannel();
+                                    }
+                                }
+                            },2500);
+                        }
+                    }
+                });
     }
 
     private void startSingleChannel(){
@@ -212,6 +253,9 @@ public class MainActivity extends AppCompatActivity {
         String gsonProject=new Gson().toJson(project);
         CameraDetection.builder(MainActivity.this)
                 .setMultiChannel(false)
+                .setMinThresheold(25)
+                .setMaxThresheold(55)
+                .setIsJianGuanYi(true)
                 .setDetectionProject(gsonProject)
                 .build(new OnResultCallback() {
                     @SuppressLint("SetTextI18n")

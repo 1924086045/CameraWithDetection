@@ -806,11 +806,13 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         for (int i = 0; i < qrAreas.size(); i++) {
             if (isJGD){
                 rotatedRect.center.x=qrAreas[i].center.x+235;
+                rotatedRect.center.y=qrAreas[i].center.y;
             } else{
                 rotatedRect.center.x=qrAreas[i].center.x+263;
+                rotatedRect.center.y=qrAreas[i].center.y-10;
             }
 
-            rotatedRect.center.y=qrAreas[i].center.y;
+//            rotatedRect.center.y=qrAreas[i].center.y;
             areas.push_back(rotatedRect);
         }
     }
@@ -1965,6 +1967,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
 
     int kvalue=15;
 //    normalize(grey, grey, 255, 0, NORM_MINMAX);
+    //对图像进行滤波过滤并使用边缘算法呈现图像轮廓
     blur(grey,grey,Size(3,3));
     Canny(grey, grey, 30, 70, 3, true);
 //    Laplacian(grey, grey, CV_8U, 5, 1, 0, BORDER_DEFAULT);
@@ -1975,6 +1978,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
 
     vector<Vec3f> circles;
     Mat srcImage;
+    //获取图像中的圆形
     HoughCircles(grey, circles, HOUGH_GRADIENT, 1, 5, 80, 35, 60, 100);
     int radius=50;
 
@@ -1993,7 +1997,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
 //            rects.push_back(rect);
 //        }
 //    }
-
+    //对获取到的圆形列表进行筛选
     for (int i = 0; i < circles.size(); i++){
         Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
 
@@ -2031,6 +2035,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
     ssimage << "/luodanmin.jpg";
     imwrite(ssimage.str().c_str(), roi2);
 
+    //取底色区域与样本区域进行色差对比
     Mat greyroi, resImg;
     cvtColor(roi2, greyroi, COLOR_BGR2GRAY);
     int rad=100;
@@ -2047,7 +2052,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
     for (int k = 0; k < haux.rows; k++) {
         for (int j = 0; j < haux.cols; j++) {
             Vec3b data = haux.at<Vec3b>(k, j);
-            if (data[2] < 30 || (data[1] < 43 && data[2] > 46)) {
+            if (data[2] < 35 || (data[1] < 43 && data[2] > 46)) {
                 aux.at<Vec3b>(k, j)[0] = 0;
                 aux.at<Vec3b>(k, j)[1] = 0;
                 aux.at<Vec3b>(k, j)[2] = 0;
