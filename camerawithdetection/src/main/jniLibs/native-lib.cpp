@@ -290,8 +290,7 @@ float majorityElement(vector<float> &nums) {
     return nums[0];
 }
 
-bool ContoursSortFun(vector<Point> contour1,vector<Point> contour2)
-{
+bool ContoursSortFun(vector<Point> contour1, vector<Point> contour2) {
     return (contourArea(contour1) > contourArea(contour2));
 }
 
@@ -457,14 +456,13 @@ Java_com_zodolabs_zzf_zj350_activity_DetectionActivity_detection(JNIEnv *env, jo
 }
 
 //求Mat的中位数
-int GetMatMidVal(Mat& img)
-{
+int GetMatMidVal(Mat &img) {
     //判断如果不是单通道直接返回128
     if (img.channels() > 1) return 128;
     int rows = img.rows;
     int cols = img.cols;
     //定义数组
-    float mathists[256] = { 0 };
+    float mathists[256] = {0};
     //遍历计算0-255的个数
     for (int row = 0; row < rows; ++row) {
         for (int col = 0; col < cols; ++col) {
@@ -484,8 +482,7 @@ int GetMatMidVal(Mat& img)
 }
 
 //求自适应阈值的最小和最大值
-void GetMatMinMaxThreshold(Mat& img, int& minval, int& maxval, float sigma)
-{
+void GetMatMinMaxThreshold(Mat &img, int &minval, int &maxval, float sigma) {
     int midval = GetMatMidVal(img);
     cout << "midval:" << midval << endl;
     // 计算低阈值
@@ -496,10 +493,12 @@ void GetMatMinMaxThreshold(Mat& img, int& minval, int& maxval, float sigma)
 
 extern "C" JNIEXPORT jobject JNICALL
 Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env, jobject instance,
-                                                                     jintArray data_, jint width,
-                                                                     jint height,
-                                                                     jstring imagePath_,jboolean isJGD,
-                                                                     jint minThresheold,jint maxThresheold) {
+                                                                    jintArray data_, jint width,
+                                                                    jint height,
+                                                                    jstring imagePath_,
+                                                                    jboolean isJGD,
+                                                                    jint minThresheold,
+                                                                    jint maxThresheold) {
     jint *data = env->GetIntArrayElements(data_, NULL);
     string imagePath = env->GetStringUTFChars(imagePath_, 0);
     if (data == NULL) {
@@ -566,9 +565,10 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //    blur(r, r, Size(9, 9));
 //    GaussianBlur(r, r, Size(9, 9), 0);
     vector<vector<Point> > contours;
-    vector<vector<Point> > linecontours;
-    int minthreshold, maxthreshold;
+//    vector<vector<Point> > linecontours;
+//    int minthreshold, maxthreshold;
 //    GetMatMinMaxThreshold(r, minthreshold, maxthreshold,0.9);//25   55
+    //边缘算法呈现轮廓图像并增强效果
     Canny(r, r, minThresheold, maxThresheold, 3, true);// 35    85
     Laplacian(r, r, CV_8U, 7, 1, 0, BORDER_DEFAULT);
 //    blur(r, r, Size(3, 3));
@@ -582,48 +582,49 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //    Laplacian(r, r, CV_8U, 3, 1, 0, BORDER_DEFAULT);
 //    blur(r, r, Size(3, 3));
 //    GaussianBlur(r, gblur, Size(3, 3), 0);
+    //提取轮廓数据
     findContours(r, contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
     vector<RotatedRect> areas;
-    vector<Rect> ctLists;
-    vector<Rect> firstList;
-    vector<Rect> rectLists;
+//    vector<Rect> ctLists;
+//    vector<Rect> firstList;
+//    vector<Rect> rectLists;
     vector<Rect> lineLists;
 
-    ctLists.clear();
+//    ctLists.clear();
 
-    Mat org_line=org;
+    Mat org_line = org;
 
     //提取CT区域轮廓
-    double area_range=230;
+    double area_range = 230;
     for (auto contour:contours) {
         auto box = minAreaRect(contour);
         Rect rect = box.boundingRect();
-        rectLists.push_back(rect);
+//        rectLists.push_back(rect);
         //识别CT区域
-        if (rect.width > 100 && rect.width < 500&&rect.height > 15&&rect.height<250) {
-            firstList.push_back(rect);
-            linecontours.push_back(contour);
+//        if (rect.width > 100 && rect.width < 500 && rect.height > 15 && rect.height < 250) {
+//            firstList.push_back(rect);
+//            linecontours.push_back(contour);
+//        }
+        double rectXMin, rectXMax, rectYMin, rectYMax, rectHeightMin, rectHeightMax, rectWidthMin, rectWidthMax;
+        rectXMin = 300;
+        rectXMax = 700;
+        rectYMin = 180;
+        rectYMax = 1200;
+        rectHeightMin = 30;
+        rectHeightMax = 70;
+        rectWidthMin = 180;
+        rectWidthMax = 280;
+        if (isJGD) {
+            rectXMin = 120;
+            rectXMax = 550;
+            rectYMin = 180;
+            rectYMax = 750;
+            rectHeightMin = 30;
+            rectHeightMax = 120;
+            rectWidthMin = 180;
+            rectWidthMax = 310;
         }
-        double rectXMin,rectXMax,rectYMin,rectYMax,rectHeightMin,rectHeightMax,rectWidthMin,rectWidthMax;
-        rectXMin=300;
-        rectXMax=700;
-        rectYMin=180;
-        rectYMax=1200;
-        rectHeightMin=30;
-        rectHeightMax=70;
-        rectWidthMin=180;
-        rectWidthMax=280;
-        if (isJGD){
-            rectXMin=120;
-            rectXMax=550;
-            rectYMin=180;
-            rectYMax=750;
-            rectHeightMin=30;
-            rectHeightMax=120;
-            rectWidthMin=180;
-            rectWidthMax=310;
-        }
-        if (rect.y > rectYMin && rect.y < rectYMax && rect.x > rectXMin &&rect.x < rectXMax) {
+        if (rect.y > rectYMin && rect.y < rectYMax && rect.x > rectXMin && rect.x < rectXMax) {
             if (rect.width > 180 && rect.width < 280) {
                 if (rect.height > rectHeightMin && rect.height < rectHeightMax) {
                     if (areas.size() > 0) {
@@ -636,23 +637,24 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
                                 break;
                             }
                         }
-                        if (areas.size()==1){
-                            double distance=areas[0].center.y-box.center.y;
-                            if (distance>130&&distance< 160){
-                                area_range=130;
+                        //判断是否是三联卡
+                        if (areas.size() == 1) {
+                            double distance = areas[0].center.y - box.center.y;
+                            if (distance > 130 && distance < 160) {
+                                area_range = 130;
                             }
                         }
                         if (!isHave) {
                             //排除中间无关轮廓
-                            double area_dis=areas[areas.size() - 1].center.y - box.center.y;
-                                if ((area_dis > 130 && area_dis < 160) ||
-                                    (area_dis > 230)) {
-                                    ctLists.push_back(rect);
-                                    areas.push_back(box);
-                                }
+                            double area_dis = areas[areas.size() - 1].center.y - box.center.y;
+                            if ((area_dis > 130 && area_dis < 160) ||
+                                (area_dis > 230)) {
+//                                    ctLists.push_back(rect);
+                                areas.push_back(box);
+                            }
                         }
                     } else {
-                        ctLists.push_back(rect);
+//                        ctLists.push_back(rect);
                         areas.push_back(box);
                     }
                 }
@@ -685,40 +687,41 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
     findContours(mat_qr, qr_contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
     vector<RotatedRect> qrAreas;
 //    if (!isLuoTiao) {
-        for (auto contour:qr_contours) {
-            auto box = minAreaRect(contour);
-            Rect rect = box.boundingRect();
-            if (isJGD){
-                if (box.center.x > 50 && box.center.x < 200 && rect.width > 110 &&
-                    rect.width < 200 &&
-                    rect.height > 110 &&
-                    rect.height < 200) {
-                    qrAreas.push_back(box);
-                }
-            } else {
-                //识别二维码区域
-                if (box.center.x > 200 && box.center.x < 480 && rect.width > 150 &&
-                    rect.width < 300 &&
-                    rect.height > 150 &&
-                    rect.height < 300) {
+    //识别二维码区域
+    for (auto contour:qr_contours) {
+        auto box = minAreaRect(contour);
+        Rect rect = box.boundingRect();
+        if (isJGD) {
+            if (box.center.x > 50 && box.center.x < 200 && rect.width > 110 &&
+                rect.width < 200 &&
+                rect.height > 110 &&
+                rect.height < 200) {
+                qrAreas.push_back(box);
+            }
+        } else {
+            //识别二维码区域
+            if (box.center.x > 200 && box.center.x < 480 && rect.width > 150 &&
+                rect.width < 300 &&
+                rect.height > 150 &&
+                rect.height < 300) {
 //                if ((rect.width - rect.height) > -30 && (rect.width - rect.height) < 30) {
-                    qrAreas.push_back(box);
+                qrAreas.push_back(box);
 //                }
-                }
             }
         }
+    }
 //    }
 
-    bool isHaveQr= false;
-    if(qrAreas.size()>0){
-        isHaveQr= true;
+    bool isHaveQr = false;
+    if (qrAreas.size() > 0) {
+        isHaveQr = true;
     }
 
     //识别裸条区域
-    bool isLuoTiao= false;
+    bool isLuoTiao = false;
     vector<RotatedRect> areaLines;
     vector<Rect> lt_rects;
-    if (!isJGD&&!isHaveQr) {
+    if (!isJGD && !isHaveQr) {
         if (areas.size() <= 1) {
             for (auto contour:contours) {
                 auto box = minAreaRect(contour);
@@ -800,16 +803,16 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
     LOGD("qr img cout: %zu", areas.size());
 
     //如果带有二维码的卡没识别到检测区域，则用二维码进行二次定位
-    if (qrAreas.size()>0&&qrAreas.size()>=areas.size()&&!isLuoTiao) {
-        RotatedRect rotatedRect=areas[0];
+    if (qrAreas.size() > 0 && qrAreas.size() >= areas.size() && !isLuoTiao) {
+        RotatedRect rotatedRect = areas[0];
         areas.clear();
         for (int i = 0; i < qrAreas.size(); i++) {
-            if (isJGD){
-                rotatedRect.center.x=qrAreas[i].center.x+235;
-                rotatedRect.center.y=qrAreas[i].center.y;
-            } else{
-                rotatedRect.center.x=qrAreas[i].center.x+263;
-                rotatedRect.center.y=qrAreas[i].center.y-10;
+            if (isJGD) {
+                rotatedRect.center.x = qrAreas[i].center.x + 235;
+                rotatedRect.center.y = qrAreas[i].center.y;
+            } else {
+                rotatedRect.center.x = qrAreas[i].center.x + 263;
+                rotatedRect.center.y = qrAreas[i].center.y - 10;
             }
 
 //            rotatedRect.center.y=qrAreas[i].center.y;
@@ -872,19 +875,19 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         }
 
         Mat cres;
-        if (isLuoTiao){
+        if (isLuoTiao) {
             cres = org(lineLists[i]);
-        } else{
+        } else {
 //            if (isHaveQr&&qrAreas.size()>=areas.size()){
 //                Rect cres_rect=Rect();
 //                cres_rect.x=areas[i].center.x;
 //                cres = org(areas[i].boundingRect());
 //            } else{
-                cres = org(areas[i].boundingRect());
+            cres = org(areas[i].boundingRect());
 //            }
         }
-        Mat h1_result;
-        Mat h1_kernel = (Mat_<char>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
+//        Mat h1_result;
+//        Mat h1_kernel = (Mat_<char>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
 //        filter2D(cres, h1_result, CV_8U, h1_kernel);
 //        convertScaleAbs(h1_result, cres);
 
@@ -900,6 +903,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         Mat res;
         cvtColor(cres, res, COLOR_BGR2GRAY);
 
+        //识别CT线区域
         Mat scalar;
         GaussianBlur(res, res, Size(11, 11), 0);
         Scharr(res, scalar, res.depth(), 1, 0);
@@ -908,7 +912,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         Mat scalar2;
         blur(scalar, scalar2, Size(scalar.cols / 2, scalar.rows / 2));
         Mat scalarrr = scalar1 - scalar2;
-        Mat scalar_line=scalarrr;
+        Mat scalar_line = scalarrr;
         normalize(scalar_line, scalar_line, 255, 0, NORM_MINMAX);
 
         Mat gau;
@@ -924,18 +928,19 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //        blur(scalarrr, scalarrr, Size(3, 3));
 //        Canny(scalarrr, scalarrr, 100, 200, 5, true);
 
-        vector<vector<Point> > linecontours;
-        vector<vector<Point> > org_contours;
+        vector<vector<Point> > linecontours; //CT线轮廓数据列表
+//        vector<vector<Point> > org_contours;
+        //提取CT线轮廓数据
         findContours(scalar_line, linecontours, RETR_LIST, CHAIN_APPROX_SIMPLE);
         vector<Point> lineareas;
         Point center;
         Point line_T;//T线
         vector<Rect> list;
         list.clear();
-        Rect rect_c,rect_t;
+        Rect rect_c, rect_t;
         bool isHaveLineT = false;
         bool isHaveLineC = false;
-        sort(linecontours.begin(),linecontours.end(),ContoursSortFun);
+        sort(linecontours.begin(), linecontours.end(), ContoursSortFun);
         for (int j = 0; j < linecontours.size(); j++) {
             auto lincontour = linecontours[j];
             auto box = minAreaRect(lincontour);
@@ -956,47 +961,50 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
             //判断CT线区域位置
             if (box.boundingRect().height > 22) {
                 if (box.center.y < 39 && box.center.y > 11) {
-                    org_contours.push_back(lincontour);
+//                    org_contours.push_back(lincontour);
                     if (!isHaveLineC) {
-                        if (box.center.x > 15 && box.center.x < 75&&box.boundingRect().width > 8 && box.boundingRect().width < 40) {
+                        if (box.center.x > 15 && box.center.x < 75 &&
+                            box.boundingRect().width > 8 && box.boundingRect().width < 40) {
                             list.push_back(boxRect);
                             rectangle(scalar_line, boxRect, Scalar(255, 255, 0), 1);
                             center = box.center;
                             Point2f P[4];
                             box.points(P);
                             isHaveLineC = true;
-                            rect_c=boxRect;
+                            rect_c = boxRect;
                         }
                     }
                     //T线已识别则跳过
                     if (!isHaveLineT) {
-                        int lineTWidthMin=8;
-                        int lineTWidthMax=40;
-                        int lineTXMin=85;
-                        int lineTXMax=130;
-                        if (isJGD){
-                            lineTWidthMin=8;
-                            lineTWidthMax=30;
-                            lineTXMin=75;
-                            lineTXMax=130;
+                        int lineTWidthMin = 8;
+                        int lineTWidthMax = 40;
+                        int lineTXMin = 85;
+                        int lineTXMax = 130;
+                        if (isJGD) {
+                            lineTWidthMin = 8;
+                            lineTWidthMax = 30;
+                            lineTXMin = 75;
+                            lineTXMax = 130;
                         }
-                        if (box.center.x > lineTXMin && box.center.x < lineTXMax&&box.boundingRect().width > lineTWidthMin && box.boundingRect().width < lineTWidthMax) {
+                        if (box.center.x > lineTXMin && box.center.x < lineTXMax &&
+                            box.boundingRect().width > lineTWidthMin &&
+                            box.boundingRect().width < lineTWidthMax) {
                             list.push_back(boxRect);
                             rectangle(scalar_line, boxRect, Scalar(255, 255, 0), 2);
                             line_T = box.center;
                             isHaveLineT = true;
-                            rect_t=boxRect;
+                            rect_t = boxRect;
                         }
                     }
                 }
             }
         }
 
-        if (!isHaveLineC&&!isHaveLineT){
+        if (!isHaveLineC && !isHaveLineT) {
             continue;
         }
 
-        Mat cres_new=cres;
+        Mat cres_new = cres;
 //        drawContours(cres_new,org_contours, -1, (0,0,255),2);
 //
 //    stringstream orgstr;
@@ -1018,12 +1026,13 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
             imwrite(scalarimg.str().c_str(), scalar_line);
         }
         if (center.x == 0 || center.y == 0) {
+            //返回无效卡
             jstring jvc = env->NewStringUTF("0");
             jstring jvt = env->NewStringUTF("0");
             jstring jpro = env->NewStringUTF("");
             jstring jpath = env->NewStringUTF(sska.str().c_str());
-            jstring jma=env->NewStringUTF("");
-            jobject jniobj = env->NewObject(stucls, constrocMID, jvc, jvt, jpro, jpath,jma);
+            jstring jma = env->NewStringUTF("");
+            jobject jniobj = env->NewObject(stucls, constrocMID, jvc, jvt, jpro, jpath, jma);
             env->CallBooleanMethod(list_obj, list_add, jniobj);
             continue;
         }
@@ -1045,43 +1054,45 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
             center.y = 39;
         }
         if (isHaveLineT) {
-            double point_c=rect_c.x;
-            if (point_c<0){
-                point_c=0;
+            //处理宽高超出范围的情况
+            double point_c = rect_c.x;
+            if (point_c < 0) {
+                point_c = 0;
             }
-            double point_t=rect_t.x + rect_t.width;
-            if (point_t>cres.cols){
-                point_t=cres.cols;
+            double point_t = rect_t.x + rect_t.width;
+            if (point_t > cres.cols) {
+                point_t = cres.cols;
             }
-            double pointyc=center.y - 8;
-            if (pointyc<0){
-                pointyc=0;
+            double pointyc = center.y - 8;
+            if (pointyc < 0) {
+                pointyc = 0;
             }
-            double pointyt=center.y + 8;
-            if (pointyt>cres.rows){
-                pointyt=cres.rows;
+            double pointyt = center.y + 8;
+            if (pointyt > cres.rows) {
+                pointyt = cres.rows;
             }
             a = Point(point_c, pointyc);
             b = Point(point_t, pointyt);
         } else {
-            double point_c=rect_c.x;
-            if (point_c<0){
-                point_c=0;
+            //处理宽高超出范围的情况
+            double point_c = rect_c.x;
+            if (point_c < 0) {
+                point_c = 0;
             }
-            double point_t=rect_c.x + rect_c.width+30;
-            if (isJGD){
-                point_t=rect_c.x + rect_c.width+15;
+            double point_t = rect_c.x + rect_c.width + 30;
+            if (isJGD) {
+                point_t = rect_c.x + rect_c.width + 15;
             }
-            if (point_t>cres.cols){
-                point_t=cres.cols;
+            if (point_t > cres.cols) {
+                point_t = cres.cols;
             }
-            double pointyc=center.y - 8;
-            if (pointyc<0){
-                pointyc=0;
+            double pointyc = center.y - 8;
+            if (pointyc < 0) {
+                pointyc = 0;
             }
-            double pointyt=center.y + 8;
-            if (pointyt>cres.rows){
-                pointyt=cres.rows;
+            double pointyt = center.y + 8;
+            if (pointyt > cres.rows) {
+                pointyt = cres.rows;
             }
             a = Point(point_c, pointyc);
             b = Point(point_t, pointyt);
@@ -1139,13 +1150,13 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         split(hsvmat, matArr);
         GaussianBlur(matArr[1], blurmat, Size(3, 3), 0);
 
-        Mat mask,dst_mask;
-        inRange(dst, Scalar(0,13,46), Scalar(190,255,255), mask);
+        Mat mask, dst_mask;
+        inRange(dst, Scalar(0, 13, 46), Scalar(190, 255, 255), mask);
 
         vector<vector<Point> > dst_contours;
         findContours(mask, dst_contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
         vector<Rect> dst_rects;
-        double s_c,s;
+        double s_c, s;
         if (isLuoTiao) {
             bool isExistT = false;
             for (auto contour:dst_contours) {
@@ -1192,17 +1203,17 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 
             isHaveLineT = isExistT;
         }
-            resize(blurmat, linemat, Size(blurmat.cols, 1));
-            // 图像均值 和 标准方差
-            Mat meanMat_c, stdMat_c;
-            double std_xc = rect_c.width;
-            if (std_xc > dst.cols) {
-                std_xc = dst.cols;
-            }
-            dst_mask=Mat(dst, Rect(Point(0, 0), Point(std_xc, dst.rows)));
-            meanStdDev(Mat(dst, Rect(Point(0, 0), Point(std_xc, dst.rows))), meanMat_c, stdMat_c);
-            double m_c = meanMat_c.at<double>(0, 0);
-            s_c = stdMat_c.at<double>(0, 0);
+        resize(blurmat, linemat, Size(blurmat.cols, 1));
+        // 图像均值 和 标准方差
+        Mat meanMat_c, stdMat_c;
+        double std_xc = rect_c.width;
+        if (std_xc > dst.cols) {
+            std_xc = dst.cols;
+        }
+        dst_mask = Mat(dst, Rect(Point(0, 0), Point(std_xc, dst.rows)));
+        meanStdDev(Mat(dst, Rect(Point(0, 0), Point(std_xc, dst.rows))), meanMat_c, stdMat_c);
+        double m_c = meanMat_c.at<double>(0, 0);
+        s_c = stdMat_c.at<double>(0, 0);
 
 //            stringstream ss_line;
 //        ss_line << imagePath;
@@ -1212,21 +1223,21 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //        ss_line << "_pic.jpg";
 //        imwrite(ss_line.str().c_str(), dst_mask);
 
-            //T线
-            if (isHaveLineT) {
-                Mat meanMat, stdMat;
-                double std_xc = dst.cols-rect_t.width;
-                if (std_xc <0) {
-                    std_xc = 0;
-                }
-                meanStdDev(Mat(dst, Rect(Point(std_xc, 0), Point(dst.cols, dst.rows))),
-                           meanMat, stdMat);
-
-                double m = meanMat.at<double>(0, 0);
-                s = stdMat.at<double>(0, 0);
-            } else {
-                s = 0;
+        //T线
+        if (isHaveLineT) {
+            Mat meanMat, stdMat;
+            double std_xc = dst.cols - rect_t.width;
+            if (std_xc < 0) {
+                std_xc = 0;
             }
+            meanStdDev(Mat(dst, Rect(Point(std_xc, 0), Point(dst.cols, dst.rows))),
+                       meanMat, stdMat);
+
+            double m = meanMat.at<double>(0, 0);
+            s = stdMat.at<double>(0, 0);
+        } else {
+            s = 0;
+        }
 //        } else{
 //            resize(blurmat, linemat, Size(dst.cols, 1));
 //        }
@@ -1244,18 +1255,18 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         sort(beginarr.begin(), beginarr.end());
         if (isHaveLineT) {
 
-            for (int i = linemat.cols-rect_t.width; i < linemat.cols; i++) {
+            for (int i = linemat.cols - rect_t.width; i < linemat.cols; i++) {
                 endarr.push_back(arr[i]);
             }
 
             sort(endarr.begin(), endarr.end());
         }
 
-        double vc, vt,scale;
-        if (isJGD){
-            scale=4.2;
-        } else{
-            scale=3.5;
+        double vc, vt, scale;
+        if (isJGD) {
+            scale = 4.2;
+        } else {
+            scale = 3.5;
         }
         if (beginarr.size() == 0) {
             vc = 0;
@@ -1283,11 +1294,11 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //                vc = (beginarr[beginarr.size() - 3]  + beginarr[beginarr.size() - 2] +
 //                      beginarr[beginarr.size() - 1] ) / 3;
 //            } else {
-                vc=s_c*scale*35/12;
+            vc = s_c * scale * 35 / 12;
 //            }
 //            }
         }
-        if (endarr.size() == 0||!isHaveLineT) {
+        if (endarr.size() == 0 || !isHaveLineT) {
             vt = 0;
         } else {
 //            double total=0;
@@ -1313,7 +1324,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //                vt = (endarr[endarr.size() - 3]  + endarr[endarr.size() - 2]  +
 //                      endarr[endarr.size() - 1] ) / 3;
 //            } else {
-                vt = s * scale*35/12;
+            vt = s * scale * 35 / 12;
 //            }
 //            }
 
@@ -1328,7 +1339,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         ss1 << "vc: " << vc << " vt: " << vt;
         LOGD("ss1 :: %s", ss1.str().c_str());
 
-        stringstream ssvc, ssvt,ssmajority;
+        stringstream ssvc, ssvt, ssmajority;
         ssvc << vc;
         ssvt << vt;
         ssmajority << majority;
@@ -1341,7 +1352,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         }
 //        jstring jpath = env->NewStringUTF(imagename.c_str());
         jstring jpath = env->NewStringUTF(sska.str().c_str());
-        jobject jniobj = env->NewObject(stucls, constrocMID, jvc, jvt, jpro, jpath,jmajority);
+        jobject jniobj = env->NewObject(stucls, constrocMID, jvc, jvt, jpro, jpath, jmajority);
         env->CallBooleanMethod(list_obj, list_add, jniobj);
     }
     env->ReleaseIntArrayElements(data_, data, 0);
@@ -1826,10 +1837,10 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionLuoDanMinB(JN
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionNongcan(JNIEnv *env,
-                                                                               jobject instance,
-                                                                               jintArray data_,
-                                                                               jint width,
-                                                                               jint height) {
+                                                                           jobject instance,
+                                                                           jintArray data_,
+                                                                           jint width,
+                                                                           jint height) {
     jint *data = env->GetIntArrayElements(data_, NULL);
     if (data == NULL) {
         return nullptr;
@@ -1908,7 +1919,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionNongcan(JNIEn
                 total += (int) data;
             }
         }
-        float resultvalue = total / (100 * 100) ;
+        float resultvalue = total / (100 * 100);
         if (resultvalue < 0) {
             resultvalue = 0;
         }
@@ -1948,10 +1959,11 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionNongcan(JNIEn
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JNIEnv *env,
-                                                                             jobject instance,
-                                                                             jintArray data_,
-                                                                             jint width,
-                                                                             jint height, jstring imagePath_) {
+                                                                              jobject instance,
+                                                                              jintArray data_,
+                                                                              jint width,
+                                                                              jint height,
+                                                                              jstring imagePath_) {
 
     jint *data = env->GetIntArrayElements(data_, NULL);
     if (data == NULL) {
@@ -1965,13 +1977,13 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
     vector<vector<Point>> squares;
     Rect roiRect;
 
-    int kvalue=15;
+    int kvalue = 15;
 //    normalize(grey, grey, 255, 0, NORM_MINMAX);
     //对图像进行滤波过滤并使用边缘算法呈现图像轮廓
-    blur(grey,grey,Size(3,3));
+    blur(grey, grey, Size(3, 3));
     Canny(grey, grey, 30, 70, 3, true);
 //    Laplacian(grey, grey, CV_8U, 5, 1, 0, BORDER_DEFAULT);
-    blur(grey,grey,Size(3,3));
+    blur(grey, grey, Size(3, 3));
 
     findContours(grey, squares, RETR_LIST, CHAIN_APPROX_SIMPLE);
     vector<Rect> rects;
@@ -1980,7 +1992,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
     Mat srcImage;
     //获取图像中的圆形
     HoughCircles(grey, circles, HOUGH_GRADIENT, 1, 5, 80, 35, 60, 100);
-    int radius=50;
+    int radius = 50;
 
     string imagePath = env->GetStringUTFChars(imagePath_, 0);
     stringstream ssgrey;
@@ -1998,15 +2010,16 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
 //        }
 //    }
     //对获取到的圆形列表进行筛选
-    for (int i = 0; i < circles.size(); i++){
+    for (int i = 0; i < circles.size(); i++) {
         Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
 
         int rads = cvRound(circles[i][2]);
-        if (center.x>300&&rads>65&&rads<70){
+        if (center.x > 300 && rads > 65 && rads < 70) {
             radius = cvRound(circles[i][2]);
 //            srcImage=Mat(Size(radius*2,radius*2),CV_8UC3);
-            Rect rect(Point(center.x-radius,center.y-radius),Point(center.x+radius,center.y+radius));
-            roiRect=rect;
+            Rect rect(Point(center.x - radius, center.y - radius),
+                      Point(center.x + radius, center.y + radius));
+            roiRect = rect;
             rects.push_back(rect);
         }
 
@@ -2038,7 +2051,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
     //取底色区域与样本区域进行色差对比
     Mat greyroi, resImg;
     cvtColor(roi2, greyroi, COLOR_BGR2GRAY);
-    int rad=100;
+    int rad = 100;
     Rect dstrect(20, 20, rad, rad);
     Mat dstimg = roi2(dstrect);
 
@@ -2067,7 +2080,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionJGDNongcan(JN
             total += (int) data;
         }
     }
-    float resultvalue = total / (100 * 100) ;
+    float resultvalue = total / (100 * 100);
     if (resultvalue < 0) {
         resultvalue = 0;
     }
