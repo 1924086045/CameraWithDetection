@@ -508,6 +508,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //    unevenLightCompensate(org,32);
 
     if (!isJGD) {
+        //如果不是监管仪则重新缩放图像大小
         resize(org, org, Size(1200, 1400));
     }
 
@@ -551,10 +552,12 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
     cvtColor(org, grey, COLOR_BGR2GRAY);
 
     Mat m1, m2;
+    //使用滤波去除图像的噪点
     GaussianBlur(grey, m1, Size(3, 3), 0);
     blur(grey, m2, Size(grey.cols / 2, grey.rows / 2));
     Mat r = grey;
 //    r=moveLightDiff(r,40);
+    //图像归一化处理
     normalize(r, r, 255, 0, NORM_MINMAX);
 //    marrEdge(r,r,11,1);
     Mat gblur, h2_result;
@@ -564,7 +567,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //    convertScaleAbs(r, r);
 //    blur(r, r, Size(9, 9));
 //    GaussianBlur(r, r, Size(9, 9), 0);
-    vector<vector<Point> > contours;
+    vector<vector<Point> > contours;//轮廓数据集合
 //    vector<vector<Point> > linecontours;
 //    int minthreshold, maxthreshold;
 //    GetMatMinMaxThreshold(r, minthreshold, maxthreshold,0.9);//25   55
@@ -584,7 +587,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //    GaussianBlur(r, gblur, Size(3, 3), 0);
     //提取轮廓数据
     findContours(r, contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
-    vector<RotatedRect> areas;
+    vector<RotatedRect> areas;//CT区域数据集合
 //    vector<Rect> ctLists;
 //    vector<Rect> firstList;
 //    vector<Rect> rectLists;
@@ -597,6 +600,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
     //提取CT区域轮廓
     double area_range = 230;
     for (auto contour:contours) {
+        //获取轮廓数据的最小矩形
         auto box = minAreaRect(contour);
         Rect rect = box.boundingRect();
 //        rectLists.push_back(rect);
@@ -605,6 +609,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //            firstList.push_back(rect);
 //            linecontours.push_back(contour);
 //        }
+        //由于监管仪和zh300图像大小不一致，需要对宽高和坐标系参数进行一些调整
         double rectXMin, rectXMax, rectYMin, rectYMax, rectHeightMin, rectHeightMax, rectWidthMin, rectWidthMax;
         rectXMin = 300;
         rectXMax = 700;
@@ -624,6 +629,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
             rectWidthMin = 180;
             rectWidthMax = 310;
         }
+        //获得符合区域和宽高范围内的矩形
         if (rect.y > rectYMin && rect.y < rectYMax && rect.x > rectXMin && rect.x < rectXMax) {
             if (rect.width > 180 && rect.width < 280) {
                 if (rect.height > rectHeightMin && rect.height < rectHeightMax) {
@@ -683,14 +689,17 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
     dilate(mat_qr, mat_qr, element);
     morphologyEx(mat_qr, mat_qr, MORPH_CLOSE, element);
 
-    vector<vector<Point> > qr_contours;
+    vector<vector<Point> > qr_contours;//二维码数据集合
+    //提取二维码轮廓数据
     findContours(mat_qr, qr_contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
     vector<RotatedRect> qrAreas;
 //    if (!isLuoTiao) {
     //识别二维码区域
     for (auto contour:qr_contours) {
+        //获取轮廓数据的最小矩形
         auto box = minAreaRect(contour);
         Rect rect = box.boundingRect();
+        //由于监管仪和zh300图像大小不一致，需要对宽高和坐标系参数进行一些调整
         if (isJGD) {
             if (box.center.x > 50 && box.center.x < 200 && rect.width > 110 &&
                 rect.width < 200 &&
@@ -720,7 +729,6 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
     //识别裸条区域
     bool isLuoTiao = false;
     vector<RotatedRect> areaLines;
-    vector<Rect> lt_rects;
     if (!isJGD && !isHaveQr) {
         if (areas.size() <= 1) {
             for (auto contour:contours) {
@@ -728,7 +736,6 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
                 Rect rect = box.boundingRect();
                 //识别裸条区域
                 if (rect.width > 50 && rect.width < 1200 && rect.height > 20 && rect.height < 90) {
-                    lt_rects.push_back(rect);
                     if (rect.y > 200 && rect.y < 1200) {
                         if (areaLines.size() == 0) {
                             lineLists.push_back(rect);
@@ -752,10 +759,12 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
                 }
             }
             if (lineLists.size() > 0) {
+                //如果未检测到检测卡，则进入裸条识别流程
                 if (areas.size() == 0) {
                     isLuoTiao = true;
                     areas = areaLines;
                 } else {
+                    //由于裸条卡槽为均匀间隔，且其间距与正常的检测卡有较大的差距，因而可以以此作为判别依据
                     bool isJunYunJianGe = true;
                     for (int i = 0; i < lineLists.size(); i++) {
                         if (i < lineLists.size() - 1) {
@@ -773,6 +782,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
                 }
             }
 
+            //因为裸条是固定长度，并且检测区域位于右侧，所以可以直接截取右侧区域作为大体的CT线区域
             for (int i = 0; i < lineLists.size(); i++) {
                 lineLists[i].x = 750;
                 lineLists[i].width = 250;
@@ -932,14 +942,11 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
 //        vector<vector<Point> > org_contours;
         //提取CT线轮廓数据
         findContours(scalar_line, linecontours, RETR_LIST, CHAIN_APPROX_SIMPLE);
-        vector<Point> lineareas;
         Point center;
         Point line_T;//T线
-        vector<Rect> list;
-        list.clear();
-        Rect rect_c, rect_t;
-        bool isHaveLineT = false;
-        bool isHaveLineC = false;
+        Rect rect_c, rect_t;//C线区域   T线区域
+        bool isHaveLineT = false;//是否有T线
+        bool isHaveLineC = false;//是否有C线
         sort(linecontours.begin(), linecontours.end(), ContoursSortFun);
         for (int j = 0; j < linecontours.size(); j++) {
             auto lincontour = linecontours[j];
@@ -965,7 +972,6 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
                     if (!isHaveLineC) {
                         if (box.center.x > 15 && box.center.x < 75 &&
                             box.boundingRect().width > 8 && box.boundingRect().width < 40) {
-                            list.push_back(boxRect);
                             rectangle(scalar_line, boxRect, Scalar(255, 255, 0), 1);
                             center = box.center;
                             Point2f P[4];
@@ -989,7 +995,6 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
                         if (box.center.x > lineTXMin && box.center.x < lineTXMax &&
                             box.boundingRect().width > lineTWidthMin &&
                             box.boundingRect().width < lineTWidthMax) {
-                            list.push_back(boxRect);
                             rectangle(scalar_line, boxRect, Scalar(255, 255, 0), 2);
                             line_T = box.center;
                             isHaveLineT = true;
@@ -1263,6 +1268,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         }
 
         double vc, vt, scale;
+        //由于修改了色值比对导致与原先的数值有较大不同，为了不改变项目阈值，所以对现在的数值进行缩放，直至范围与原先一致
         if (isJGD) {
             scale = 4.2;
         } else {
