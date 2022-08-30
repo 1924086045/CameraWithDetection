@@ -1930,6 +1930,18 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detectionNongcan(JNIEn
             resultvalue = 0;
         }
 
+        //根据标准检测范围调整读取的数值
+        if (resultvalue>13&&resultvalue<=21){
+            //b08
+            resultvalue=resultvalue+20;
+        } else if (resultvalue>21&&resultvalue<=58){
+            //b09
+            resultvalue=resultvalue+30;
+        } else if (resultvalue>58&&resultvalue<=103){
+            //b10
+            resultvalue=resultvalue+50;
+        }
+
         ss << resultvalue << ',';
 
         Mat rectMat = cres(dstrect);
