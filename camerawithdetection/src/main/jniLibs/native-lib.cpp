@@ -884,7 +884,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
             }
         }
 
-        Mat cres;
+        Mat cres;//识别到的CT线检测区域
         if (isLuoTiao) {
             cres = org(lineLists[i]);
         } else {
@@ -1161,7 +1161,7 @@ Java_com_zodo_camerawithdetection_activity_CameraActivity_detection(JNIEnv *env,
         vector<vector<Point> > dst_contours;
         findContours(mask, dst_contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
         vector<Rect> dst_rects;
-        double s_c, s;
+        double s_c, s;//C线色值  T线色值
         if (isLuoTiao) {
             bool isExistT = false;
             for (auto contour:dst_contours) {
